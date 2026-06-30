@@ -351,6 +351,7 @@ const ICON = {
   pipeline:'<svg viewBox="0 0 24 24" fill="none"><circle cx="3.4" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.4" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.4" cy="18" r="1.1" fill="currentColor" stroke="none"/><path d="M8 6h13M8 12h13M8 18h13"/></svg>',
   users:'<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.1"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.3" cy="9.4" r="2.3"/><path d="M15.6 14.3c2.5.4 4.3 2.4 4.3 5"/></svg>',
   chart:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20" stroke-width="1.3"/></svg>',
+  productivity:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 17l4-4 4 4 4-5 4 2"/><path d="M3 20h18"/><circle cx="7" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="17" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="14" r="1.2" fill="currentColor" stroke="none"/></svg>',
   alert:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9.3v4.6M12 17h.01"/></svg>',
   doc:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9 12.3h6M9 16h6"/></svg>',
   settings:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.16-1.5l1.8-1.3-1.6-2.7-2.1.6a7 7 0 0 0-1.4-.8L15 4h-3l-.5 2.1a7 7 0 0 0-1.4.8l-2-.6-1.7 2.7 1.8 1.3a7 7 0 0 0 0 3l-1.8 1.3 1.7 2.7 2-.6c.4.3.9.6 1.4.8L12 20h3l.5-2.2c.5-.2 1-.5 1.4-.8l2.1.6 1.6-2.7-1.8-1.3c.1-.4.16-1 .16-1.6z"/></svg>',
@@ -507,6 +508,7 @@ const NAV = [
  {id:'team',label:'Equipes',icon:'users'},
  {id:'indicators',label:'Indicadores',icon:'chart'},
  {id:'observations',label:'Observações',icon:'note'},
+ {id:'productivity',label:'Produtividade',icon:'productivity'},
  {id:'reports',label:'Relatórios',icon:'doc'},
  {id:'settings',label:'Configurações',icon:'settings'}
 ];
@@ -586,6 +588,7 @@ function setView(id){
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
   document.getElementById('sidebar').classList.remove('open');
   const renderers = {overview:renderOverview,projects:renderProjects,pipeline:renderPipeline,team:renderTeam,indicators:renderIndicators,observations:renderObservations,
+    productivity:renderProductivity,
     reports:renderReports,
     settings:()=>renderPlaceholder('Configurações',['Controle de permissões por perfil (gestor, PO, dev, QA)','Conexão direta à planilha/base de origem (atualização automática)','Personalização de campos, papéis e limites de capacidade'])};
   (renderers[id]||renderOverview)();
@@ -1261,6 +1264,180 @@ function renderObservations(){
     <div class="obs-card-head"><strong>${p.nome}</strong>${statusTag(p.status)}${critTag(p.crit)}</div>
     <div class="obs-text">${p.obs}</div>
   </div>`).join('') : '<p class="cell-muted">Nenhuma observação registrada.</p>';
+}
+
+/* =========================================================
+   PRODUTIVIDADE
+========================================================= */
+const prodState = { profissional: '', projeto: '' };
+
+function renderProductivity(){
+  const c = document.getElementById('content');
+
+  const allNames = ALL_NAMES.slice();
+  const allProjects = [...new Set(PROJECTS.map(p=>p.nome))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+  c.innerHTML = `
+  <div class="view active" id="viewProductivity">
+    <div class="view-head">
+      <div>
+        <h1>Produtividade</h1>
+        <p>Acompanhe a produtividade por profissional e por projeto</p>
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="panel" style="margin-bottom:20px;">
+      <div class="panel-head"><h3>Filtros</h3></div>
+      <div class="panel-body">
+        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
+          <div class="finder-field" style="flex:1;min-width:220px;">
+            <label>Profissional</label>
+            <select id="prodFilterProfissional" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
+              <option value="">Todos os profissionais</option>
+              ${allNames.map(n=>`<option value="${n}"${prodState.profissional===n?' selected':''}>${n}</option>`).join('')}
+            </select>
+          </div>
+          <div class="finder-field" style="flex:1;min-width:220px;">
+            <label>Projeto</label>
+            <select id="prodFilterProjeto" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
+              <option value="">Todos os projetos</option>
+              ${allProjects.map(p=>`<option value="${p}"${prodState.projeto===p?' selected':''}>${p}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display:flex;gap:8px;padding-bottom:1px;">
+            <button class="btn btn-primary" id="prodBtnFiltrar">${icon('search')}Filtrar</button>
+            <button class="btn btn-ghost" id="prodBtnLimpar">Limpar</button>
+            <button class="btn btn-ghost" id="prodBtnExportPDF">${icon('download')}Exportar PDF</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de resultado -->
+    <div id="prodResultado">
+      ${renderProductivityContent()}
+    </div>
+  </div>`;
+
+  document.getElementById('prodFilterProfissional').addEventListener('change', e=>{ prodState.profissional=e.target.value; });
+  document.getElementById('prodFilterProjeto').addEventListener('change', e=>{ prodState.projeto=e.target.value; });
+  document.getElementById('prodBtnFiltrar').addEventListener('click', ()=>{
+    document.getElementById('prodResultado').innerHTML = renderProductivityContent();
+  });
+  document.getElementById('prodBtnLimpar').addEventListener('click', ()=>{
+    prodState.profissional=''; prodState.projeto='';
+    document.getElementById('prodFilterProfissional').value='';
+    document.getElementById('prodFilterProjeto').value='';
+    document.getElementById('prodResultado').innerHTML = renderProductivityContent();
+  });
+  document.getElementById('prodBtnExportPDF').addEventListener('click', exportProductivityPDF);
+
+  injectViewExportButton();
+}
+
+function renderProductivityContent(){
+  const hasProd = typeof PRODUCTIVITY_DATA !== 'undefined' && PRODUCTIVITY_DATA.length > 0;
+  if(!hasProd) return renderProductivityPlaceholder();
+
+  let data = PRODUCTIVITY_DATA;
+  if(prodState.profissional) data = data.filter(d=>d.profissional===prodState.profissional);
+  if(prodState.projeto) data = data.filter(d=>d.projeto===prodState.projeto);
+
+  if(!data.length) return `
+    <div class="placeholder-panel">
+      ${icon('search')}
+      <h3>Nenhum registro encontrado</h3>
+      <p>Ajuste os filtros e tente novamente.</p>
+    </div>`;
+
+  const rows = data.map(d=>`
+    <tr>
+      <td>${d.profissional||'—'}</td>
+      <td>${d.projeto||'—'}</td>
+      <td>${d.periodo||'—'}</td>
+      <td>${d.tarefasConcluidas??'—'}</td>
+      <td>${d.horasTrabalhadas??'—'}</td>
+      <td>${d.entregasNoPrazo??'—'}</td>
+      <td>${d.observacao||'—'}</td>
+    </tr>`).join('');
+
+  return `
+  <div class="panel">
+    <div class="panel-head">
+      <h3>Registros de Produtividade</h3>
+      <span class="sub">${data.length} registro(s) encontrado(s)</span>
+    </div>
+    <div class="panel-body table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Profissional</th>
+            <th>Projeto</th>
+            <th>Período</th>
+            <th>Tarefas Concluídas</th>
+            <th>Horas Trabalhadas</th>
+            <th>Entregas no Prazo</th>
+            <th>Observação</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  </div>`;
+}
+
+function renderProductivityPlaceholder(){
+  const filtroAtivo = prodState.profissional || prodState.projeto;
+  return `
+  <div class="placeholder-panel">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20" stroke-width="1.3"/></svg>
+    <h3>Base de dados ainda não conectada</h3>
+    <p style="max-width:440px;margin:6px auto 0;font-size:13px;line-height:1.6;">
+      A interface de produtividade está pronta. Assim que a base de dados for enviada, os dados aparecerão aqui com os filtros por profissional e projeto.
+    </p>
+    ${filtroAtivo ? `<p style="margin-top:12px;font-size:12px;color:var(--amber);">Filtros ativos: ${[prodState.profissional,prodState.projeto].filter(Boolean).join(' · ')}</p>` : ''}
+    <ul style="margin-top:20px;">
+      <li>Filtro por profissional</li>
+      <li>Filtro por projeto</li>
+      <li>Exportação em PDF</li>
+      <li>Tarefas concluídas, horas trabalhadas e entregas no prazo</li>
+    </ul>
+  </div>`;
+}
+
+async function exportProductivityPDF(){
+  if(!window.jspdf?.jsPDF){ toast('Biblioteca de PDF ainda carregando — tente em alguns segundos.'); return; }
+  if(!window.html2canvas){ toast('Biblioteca de captura ainda carregando — tente em alguns segundos.'); return; }
+  const btn = document.getElementById('prodBtnExportPDF');
+  try{
+    if(btn){ btn.disabled=true; btn.innerHTML=`${icon('download')}Gerando...`; }
+    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='hidden');
+    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+    const el = document.getElementById('viewProductivity');
+    const canvas = await html2canvas(el,{backgroundColor:'#F7F9FB',scale:2,useCORS:true,allowTaint:true,logging:false,scrollX:0,scrollY:-window.scrollY});
+    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='');
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+    const W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight();
+    const ratio=canvas.height/canvas.width;
+    let imgH=W*ratio;
+    let page=0;
+    while(page*H < imgH){
+      if(page>0) pdf.addPage();
+      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-(page*H),W,imgH);
+      page++;
+    }
+    const ts=new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
+    pdf.save(`produtividade_${ts}.pdf`);
+    toast('PDF exportado com sucesso!');
+  } catch(e){
+    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='');
+    toast('Erro ao gerar PDF.');
+    console.error(e);
+  } finally{
+    if(btn){ btn.disabled=false; btn.innerHTML=`${icon('download')}Exportar PDF`; }
+  }
 }
 
 /* =========================================================
