@@ -1338,19 +1338,37 @@ const PRODUCTIVITY_DATA = [
   {"profissional":"YURI DE JESUS GOES","atuacao":"ANALISTA DE TESTES","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"95.32","periodo":"01/06/2026 – 30/06/2026"}
 ];
 
-const prodState = { profissional: '', atuacao: '' };
+const prodState = { profissional: '', atuacao: '', periodo: '' };
+
+/* Extrai "MM/YYYY" do campo periodo ex: "01/06/2026 – 30/06/2026" → "06/2026" */
+function prodPeriodoKey(p){
+  if(!p) return '';
+  const m = p.match(/(\d{2})\/(\d{4})/);
+  return m ? `${m[1]}/${m[2]}` : p;
+}
+
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function prodPeriodoLabel(key){
+  if(!key) return key;
+  const [mm, yyyy] = key.split('/');
+  return `${MESES[parseInt(mm,10)-1]} / ${yyyy}`;
+}
 
 function renderProductivity(){
   const c = document.getElementById('content');
   const nomes = [...new Set(PRODUCTIVITY_DATA.map(d=>d.profissional))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
   const atuacoes = [...new Set(PRODUCTIVITY_DATA.map(d=>d.atuacao))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const periodos = [...new Set(PRODUCTIVITY_DATA.map(d=>prodPeriodoKey(d.periodo)))].sort().reverse();
+
+  /* Pré-seleciona o período mais recente se nenhum estiver selecionado */
+  if(!prodState.periodo && periodos.length) prodState.periodo = periodos[0];
 
   c.innerHTML = `
   <div class="view active" id="viewProductivity">
     <div class="view-head">
       <div>
         <h1>Produtividade</h1>
-        <p>Horas apontadas no Redmine · Período: 01/06/2026 – 30/06/2026</p>
+        <p>Horas apontadas no Redmine${prodState.periodo ? ' · ' + prodPeriodoLabel(prodState.periodo) : ''}</p>
       </div>
     </div>
 
@@ -1362,20 +1380,31 @@ function renderProductivity(){
       <div class="panel-head"><h3>Filtros</h3></div>
       <div class="panel-body">
         <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
-          <div class="finder-field" style="flex:1;min-width:220px;">
+
+          <div class="finder-field" style="flex:0 0 200px;min-width:160px;">
+            <label>Período (Mês / Ano)</label>
+            <select id="prodFilterPeriodo" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
+              <option value="">Todos os períodos</option>
+              ${periodos.map(p=>`<option value="${p}"${prodState.periodo===p?' selected':''}>${prodPeriodoLabel(p)}</option>`).join('')}
+            </select>
+          </div>
+
+          <div class="finder-field" style="flex:1;min-width:200px;">
             <label>Profissional</label>
             <select id="prodFilterProfissional" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
               <option value="">Todos os profissionais</option>
               ${nomes.map(n=>`<option value="${n}"${prodState.profissional===n?' selected':''}>${n}</option>`).join('')}
             </select>
           </div>
-          <div class="finder-field" style="flex:1;min-width:220px;">
+
+          <div class="finder-field" style="flex:1;min-width:180px;">
             <label>Atuação</label>
             <select id="prodFilterAtuacao" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
               <option value="">Todas as atuações</option>
               ${atuacoes.map(a=>`<option value="${a}"${prodState.atuacao===a?' selected':''}>${a}</option>`).join('')}
             </select>
           </div>
+
           <div style="display:flex;gap:8px;padding-bottom:1px;">
             <button class="btn btn-primary" id="prodBtnFiltrar">${icon('search')}Filtrar</button>
             <button class="btn btn-ghost" id="prodBtnLimpar">Limpar</button>
@@ -1392,14 +1421,17 @@ function renderProductivity(){
   renderProdKpis();
   renderProdTabela();
 
+  document.getElementById('prodFilterPeriodo').addEventListener('change', e=>{ prodState.periodo=e.target.value; });
   document.getElementById('prodFilterProfissional').addEventListener('change', e=>{ prodState.profissional=e.target.value; });
   document.getElementById('prodFilterAtuacao').addEventListener('change', e=>{ prodState.atuacao=e.target.value; });
-  document.getElementById('prodBtnFiltrar').addEventListener('click', ()=>{ renderProdTabela(); });
+  document.getElementById('prodBtnFiltrar').addEventListener('click', ()=>{ renderProdTabela(); renderProdKpis(); });
   document.getElementById('prodBtnLimpar').addEventListener('click', ()=>{
-    prodState.profissional=''; prodState.atuacao='';
+    const periodos2 = [...new Set(PRODUCTIVITY_DATA.map(d=>prodPeriodoKey(d.periodo)))].sort().reverse();
+    prodState.profissional=''; prodState.atuacao=''; prodState.periodo=periodos2[0]||'';
     document.getElementById('prodFilterProfissional').value='';
     document.getElementById('prodFilterAtuacao').value='';
-    renderProdTabela();
+    document.getElementById('prodFilterPeriodo').value=prodState.periodo;
+    renderProdTabela(); renderProdKpis();
   });
   document.getElementById('prodBtnExportPDF').addEventListener('click', exportProductivityPDF);
   injectViewExportButton();
@@ -1407,6 +1439,7 @@ function renderProductivity(){
 
 function prodFiltered(){
   let data = PRODUCTIVITY_DATA;
+  if(prodState.periodo) data = data.filter(d=>prodPeriodoKey(d.periodo)===prodState.periodo);
   if(prodState.profissional) data = data.filter(d=>d.profissional===prodState.profissional);
   if(prodState.atuacao) data = data.filter(d=>d.atuacao===prodState.atuacao);
   return data;
@@ -1418,10 +1451,11 @@ function prodHoras(h){
 }
 
 function renderProdKpis(){
-  const total = PRODUCTIVITY_DATA.length;
-  const comHoras = PRODUCTIVITY_DATA.filter(d=>d.horasTrabalhadas!=='Sem horas' && parseFloat(d.horasTrabalhadas)>0).length;
+  const base = prodFiltered();
+  const total = base.length;
+  const comHoras = base.filter(d=>d.horasTrabalhadas!=='Sem horas' && parseFloat(d.horasTrabalhadas)>0).length;
   const semHoras = total - comHoras;
-  const totalH = PRODUCTIVITY_DATA.reduce((s,d)=>s+prodHoras(d.horasTrabalhadas),0);
+  const totalH = base.reduce((s,d)=>s+prodHoras(d.horasTrabalhadas),0);
   const media = comHoras>0?(totalH/comHoras).toFixed(1):0;
 
   document.getElementById('prodKpis').innerHTML = `
