@@ -6,6 +6,7 @@
 <title>Saúde Digital - SISD · Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
   --navy-900:#0A1B33;
@@ -1493,33 +1494,76 @@ function renderProdTabela(){
   </div>`;
 }
 
-async function exportProductivityPDF(){
+function exportProductivityPDF(){
   if(!window.jspdf?.jsPDF){ toast('Biblioteca de PDF ainda carregando — tente em alguns segundos.'); return; }
-  if(!window.html2canvas){ toast('Biblioteca de captura ainda carregando — tente em alguns segundos.'); return; }
   const btn = document.getElementById('prodBtnExportPDF');
   try{
-    if(btn){ btn.disabled=true; btn.innerHTML=`${icon('download')}Gerando...`; }
-    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='hidden');
-    await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-    const el = document.getElementById('viewProductivity');
-    const canvas = await html2canvas(el,{backgroundColor:'#F7F9FB',scale:2,useCORS:true,allowTaint:true,logging:false,scrollX:0,scrollY:-window.scrollY});
-    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='');
+    if(btn){ btn.disabled=true; btn.textContent='Gerando...'; }
     const {jsPDF} = window.jspdf;
-    const pdf = new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
-    const W=pdf.internal.pageSize.getWidth(), H=pdf.internal.pageSize.getHeight();
-    const ratio=canvas.height/canvas.width;
-    let imgH=W*ratio;
-    let page=0;
-    while(page*H < imgH){
-      if(page>0) pdf.addPage();
-      pdf.addImage(canvas.toDataURL('image/png'),'PNG',0,-(page*H),W,imgH);
-      page++;
-    }
-    const ts=new Date().toLocaleDateString('pt-BR').replace(/\//g,'-');
-    pdf.save(`produtividade_${ts}.pdf`);
+    const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
+    const data = prodFiltered();
+    const ts = new Date().toLocaleDateString('pt-BR');
+    const periodo = data[0]?.periodo || '01/06/2026 – 30/06/2026';
+
+    // Cabeçalho
+    pdf.setFillColor(10, 27, 51);
+    pdf.rect(0, 0, 297, 18, 'F');
+    pdf.setTextColor(255,255,255);
+    pdf.setFontSize(13); pdf.setFont('helvetica','bold');
+    pdf.text('Saúde Digital - SISD · Produtividade', 14, 11);
+    pdf.setFontSize(8); pdf.setFont('helvetica','normal');
+    pdf.text(`Período: ${periodo}   ·   Emitido em: ${ts}   ·   ${data.length} profissional(is)`, 14, 16);
+
+    // KPIs linha
+    const comH = data.filter(d=>d.horasTrabalhadas!=='Sem horas'&&parseFloat(d.horasTrabalhadas)>0).length;
+    const semH = data.length - comH;
+    const totalH = data.reduce((s,d)=>s+prodHoras(d.horasTrabalhadas),0);
+    const media = comH>0?(totalH/comH).toFixed(1):0;
+    pdf.setTextColor(10,27,51);
+    pdf.setFontSize(9); pdf.setFont('helvetica','bold');
+    pdf.text(`Total profissionais: ${data.length}   |   Com horas: ${comH}   |   Sem horas: ${semH}   |   Total: ${totalH.toFixed(2)}h   |   Média: ${media}h`, 14, 25);
+
+    // Tabela com AutoTable
+    pdf.autoTable({
+      startY: 30,
+      head: [['Profissional','Atuação','Vínculo','Jornada','Horas Apontadas','Período']],
+      body: data.map(d=>[
+        d.profissional,
+        d.atuacao,
+        d.vinculo,
+        d.jornada,
+        d.horasTrabalhadas==='Sem horas'?'Sem horas':`${parseFloat(d.horasTrabalhadas).toFixed(2)}h`,
+        d.periodo
+      ]),
+      styles:{ fontSize:8, cellPadding:3, overflow:'linebreak' },
+      headStyles:{ fillColor:[10,27,51], textColor:255, fontStyle:'bold', fontSize:8 },
+      columnStyles:{
+        0:{cellWidth:60},
+        1:{cellWidth:52},
+        2:{cellWidth:22},
+        3:{cellWidth:24},
+        4:{cellWidth:28, halign:'right'},
+        5:{cellWidth:38}
+      },
+      alternateRowStyles:{ fillColor:[247,249,251] },
+      didParseCell(info){
+        if(info.column.index===4 && info.cell.raw==='Sem horas' && info.section==='body'){
+          info.cell.styles.textColor=[181,121,10];
+          info.cell.styles.fontStyle='bold';
+        }
+      },
+      margin:{left:14, right:14},
+      didDrawPage(d2){
+        // rodapé em cada página
+        const pg = pdf.internal.getNumberOfPages();
+        pdf.setFontSize(7); pdf.setTextColor(140,140,140);
+        pdf.text(`Página ${d2.pageNumber}`, 283, 205, {align:'right'});
+      }
+    });
+
+    pdf.save(`produtividade_${ts.replace(/\//g,'-')}.pdf`);
     toast('PDF exportado com sucesso!');
   } catch(e){
-    document.querySelectorAll('.no-screen-pdf').forEach(el=>el.style.visibility='');
     toast('Erro ao gerar PDF.');
     console.error(e);
   } finally{
