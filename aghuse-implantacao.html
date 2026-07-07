@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Implantação AGHUse - SISD · Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --navy-900:#0A1B33;
@@ -261,6 +261,7 @@ function renderShell(){
       </div>
       <div class="topbar-actions">
         <button class="btn btn-ghost" id="btnClear">Limpar filtros</button>
+        <button class="btn btn-ghost" id="btnExportPDF">${icon('doc')}Exportar PDF</button>
         <button class="btn btn-primary" id="btnExport">${icon('download')}Exportar CSV</button>
       </div>
     </header>
@@ -284,6 +285,7 @@ function renderShell(){
     renderContent();
   });
   document.getElementById('btnExport').addEventListener('click',exportCSV);
+  document.getElementById('btnExportPDF').addEventListener('click',exportScreenPDF);
 }
 
 function fillSelect(id, opts){
@@ -460,6 +462,116 @@ function exportCSV(){
   a.download = `aghuse-implantacao${state.situacao?'-'+state.situacao:''}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+let SISD_LOGO_WHITE_B64 = null;
+(async()=>{ try{ const r=await fetch("sisd-logo-white.png",{cache:"force-cache"}); const blob=await r.blob(); const reader=new FileReader(); reader.onload=()=>{ SISD_LOGO_WHITE_B64=reader.result; }; reader.readAsDataURL(blob); }catch(e){} })();
+
+async function exportScreenPDF(){
+  if(!window.jspdf || !window.jspdf.jsPDF){ alert('Biblioteca de PDF ainda carregando — tente novamente em alguns segundos.'); return; }
+  if(!window.html2canvas){ alert('Biblioteca de captura ainda carregando — tente novamente em alguns segundos.'); return; }
+  const content = document.getElementById('content');
+  const btn = document.getElementById('btnExportPDF');
+  if(!content) return;
+  const filterBits = [];
+  if(state.situacao) filterBits.push(SIT_META[state.situacao].label);
+  if(state.tipo) filterBits.push(state.tipo);
+  if(state.gestao) filterBits.push('Gestão '+state.gestao);
+  if(state.atraso) filterBits.push(state.atraso==='Sim'?'Em atraso':state.atraso==='Não'?'No prazo':'Atraso não informado');
+  if(state.q) filterBits.push(`Busca: "${state.q}"`);
+  const subtitle = filterBits.length ? filterBits.join(' · ') : 'Todas as unidades';
+
+  try{
+    if(btn){ btn.disabled = true; btn.innerHTML = `${icon('doc')}Gerando PDF...`; }
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+
+    const canvas = await html2canvas(content, {
+      backgroundColor: '#F7F9FB',
+      scale: Math.min(3, Math.max(2, window.devicePixelRatio || 2)),
+      useCORS: true,
+      allowTaint: true,
+      logging: false,
+      scrollX: 0,
+      scrollY: -window.scrollY,
+      windowWidth: Math.max(document.documentElement.scrollWidth, content.scrollWidth),
+      windowHeight: Math.max(content.scrollHeight, document.documentElement.clientHeight)
+    });
+
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:'landscape', unit:'pt', format:'a3' });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+    const margin = 22;
+    const headerH = 52;
+    const footerH = 18;
+    const imgW = pageW - margin*2;
+    const usableH = pageH - headerH - margin - footerH;
+    const sourcePageH = Math.floor(usableH * canvas.width / imgW);
+
+    /* Corta entre unidades/painéis, nunca no meio de um card */
+    const contentRect = content.getBoundingClientRect();
+    const scaleY = canvas.height / content.scrollHeight;
+    const rootSel = '.unit-card, .kpi-card, .kpi-grid, .sit-tabs, .panel-head, .view-head';
+
+    const cardTopsPx = [0];
+    content.querySelectorAll(rootSel).forEach(el=>{
+      const parent = el.parentElement?.closest(rootSel.split(',').map(s=>s.trim()).join(','));
+      if(parent) return;
+      const r = el.getBoundingClientRect();
+      const top = Math.round((r.top - contentRect.top + content.scrollTop) * scaleY);
+      if(top > 20) cardTopsPx.push(top);
+    });
+    cardTopsPx.sort((a,b)=>a-b);
+
+    function getSlice(srcY){
+      const limit = srcY + sourcePageH;
+      if(limit >= canvas.height) return canvas.height - srcY;
+      for(const top of cardTopsPx){
+        if(top > limit) return top - srcY;
+      }
+      return sourcePageH;
+    }
+
+    const pageCanvas = document.createElement('canvas');
+    const pageCtx = pageCanvas.getContext('2d');
+    pageCanvas.width = canvas.width;
+
+    const pages = [];
+    let srcY = 0;
+    while(srcY < canvas.height){
+      const sliceH = Math.max(getSlice(srcY), 10);
+      pageCanvas.height = sliceH;
+      pageCtx.fillStyle = '#F7F9FB';
+      pageCtx.fillRect(0,0,pageCanvas.width,sliceH);
+      pageCtx.drawImage(canvas,0,srcY,canvas.width,sliceH,0,0,canvas.width,sliceH);
+      pages.push({data:pageCanvas.toDataURL('image/png',1), height:sliceH*imgW/canvas.width});
+      srcY += sliceH;
+    }
+
+    pages.forEach((page,idx)=>{
+      if(idx>0) pdf.addPage();
+      pdf.setFillColor(10,27,51);
+      pdf.rect(0,0,pageW,headerH,'F');
+      if(SISD_LOGO_WHITE_B64){ try{ pdf.addImage(SISD_LOGO_WHITE_B64,'PNG',margin,4,44,44); }catch(e){} }
+      pdf.setTextColor(255,255,255);
+      pdf.setFont('helvetica','bold'); pdf.setFontSize(13);
+      pdf.text('Saúde Digital - SISD · Implantação AGHUse', margin+50, 22);
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(9);
+      pdf.text(subtitle, margin+50, 38);
+      pdf.setFontSize(8);
+      pdf.text(new Date().toLocaleDateString('pt-BR'), pageW-margin, 38, {align:'right'});
+      pdf.addImage(page.data,'PNG',margin,headerH+4,imgW,page.height,undefined,'MEDIUM');
+      pdf.setFont('helvetica','normal'); pdf.setFontSize(8); pdf.setTextColor(120,130,145);
+      pdf.text(`Saúde Digital - SISD — Implantação AGHUse — página ${idx+1} de ${pages.length}`, margin, pageH-6);
+    });
+
+    pdf.save(`aghuse-implantacao${state.situacao?'-'+state.situacao:''}.pdf`);
+  }catch(err){
+    console.error(err);
+    alert('Não foi possível gerar o PDF da tela atual.');
+  }finally{
+    if(btn){ btn.disabled = false; btn.innerHTML = `${icon('doc')}Exportar PDF`; }
+  }
 }
 
 renderShell();
