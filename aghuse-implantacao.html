@@ -406,7 +406,7 @@ function unitCard(u){
         <div class="progress-label"><span>${u.modulosImplantados.length} de ${TOTAL_MODULOS} módulos implantados</span><span>${pct(p)}</span></div>
       </div>
       <div class="unit-meta">
-        <span>${icon('users')} Implantadores: <b>${u.qtdAtual ?? '—'}/${u.qtdIdeal ?? '—'}</b> ${u.qtdFalta>0?`<span style="color:var(--red)">(faltam ${u.qtdFalta})</span>`:''}</span>
+        <span>${icon('users')} Implantadores: <b>${u.qtdAtual ?? '—'}/${u.qtdIdeal ?? '—'}</b> ${u.qtdFalta>0?`<span style="color:var(--red)">(faltam ${u.qtdFalta})</span>`:u.qtdFalta<0?`<span style="color:var(--green)">(excedem ${-u.qtdFalta})</span>`:''}</span>
       </div>
       ${u.impedimentoPrincipal?`<div class="unit-impedimento">${u.impedimentoPrincipal}</div>`:''}
     </div>
