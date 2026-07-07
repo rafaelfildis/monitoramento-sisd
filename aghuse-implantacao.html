@@ -129,7 +129,7 @@ input,select{font-family:inherit;}
 .unit-head{padding:14px 16px 12px;cursor:pointer;}
 .unit-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:6px;}
 .unit-name{font-size:13.6px;font-weight:700;color:var(--navy-900);line-height:1.3;}
-.unit-sigla{font-size:11px;color:var(--gray-500);font-weight:600;margin-top:2px;}
+.unit-sigla{display:inline-flex;font-size:11px;color:var(--navy-900);font-weight:800;letter-spacing:.02em;margin-top:5px;background:var(--slate-100);border:1px solid var(--gray-200);border-radius:6px;padding:2px 8px;}
 .unit-badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0;}
 .unit-progress{margin-top:8px;}
 .progress-track{height:7px;border-radius:4px;background:var(--gray-100);overflow:hidden;}
@@ -217,7 +217,7 @@ function filteredUnits(){
       if(!hay.includes(q)) return false;
     }
     return true;
-  });
+  }).sort((a,b)=> unitProgress(b)-unitProgress(a) || a.nome.localeCompare(b.nome,'pt-BR'));
 }
 
 function computeStats(list){
