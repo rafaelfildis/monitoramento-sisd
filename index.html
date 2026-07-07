@@ -6,7 +6,6 @@
 <title>Saúde Digital - SISD · Gestão</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
 :root{
   --navy-900:#0A1B33;
@@ -352,7 +351,6 @@ const ICON = {
   pipeline:'<svg viewBox="0 0 24 24" fill="none"><circle cx="3.4" cy="6" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.4" cy="12" r="1.1" fill="currentColor" stroke="none"/><circle cx="3.4" cy="18" r="1.1" fill="currentColor" stroke="none"/><path d="M8 6h13M8 12h13M8 18h13"/></svg>',
   users:'<svg viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.1"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><circle cx="17.3" cy="9.4" r="2.3"/><path d="M15.6 14.3c2.5.4 4.3 2.4 4.3 5"/></svg>',
   chart:'<svg viewBox="0 0 24 24" fill="none"><path d="M4 20V10M11 20V4M18 20v-7"/><path d="M2 20h20" stroke-width="1.3"/></svg>',
-  productivity:'<svg viewBox="0 0 24 24" fill="none"><path d="M3 17l4-4 4 4 4-5 4 2"/><path d="M3 20h18"/><circle cx="7" cy="13" r="1.2" fill="currentColor" stroke="none"/><circle cx="11" cy="17" r="1.2" fill="currentColor" stroke="none"/><circle cx="15" cy="12" r="1.2" fill="currentColor" stroke="none"/><circle cx="19" cy="14" r="1.2" fill="currentColor" stroke="none"/></svg>',
   alert:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3 2 20h20L12 3z"/><path d="M12 9.3v4.6M12 17h.01"/></svg>',
   doc:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4M9 12.3h6M9 16h6"/></svg>',
   settings:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.16-1.5l1.8-1.3-1.6-2.7-2.1.6a7 7 0 0 0-1.4-.8L15 4h-3l-.5 2.1a7 7 0 0 0-1.4.8l-2-.6-1.7 2.7 1.8 1.3a7 7 0 0 0 0 3l-1.8 1.3 1.7 2.7 2-.6c.4.3.9.6 1.4.8L12 20h3l.5-2.2c.5-.2 1-.5 1.4-.8l2.1.6 1.6-2.7-1.8-1.3c.1-.4.16-1 .16-1.6z"/></svg>',
@@ -362,7 +360,9 @@ const ICON = {
   x:'<svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18"/></svg>',
   note:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5z"/><path d="M16 4v3h3M8 11h8M8 15h5"/></svg>',
   arrowRight:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
-  user:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>'
+  user:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>',
+  trophy:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10v3.2a5 5 0 0 1-10 0V4z"/><path d="M7 5.2H4.6A2.6 2.6 0 0 0 7 9M17 5.2h2.4A2.6 2.6 0 0 1 17 9"/><path d="M12 12.2v2.8M9.4 20h5.2M9.9 17h4.2v1.4a1.4 1.4 0 0 1-1.4 1.4h-1.4a1.4 1.4 0 0 1-1.4-1.4V17z"/></svg>',
+  layers:'<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 5-9 5-9-5 9-5z"/><path d="M3 13l9 5 9-5"/></svg>'
 };
 function icon(name){return ICON[name]||'';}
 
@@ -482,9 +482,37 @@ const ROSTER_BY_NAME = Object.fromEntries(ROSTER.map(r=>[r.name,r]));
 const ALL_NAMES = ROSTER.map(r=>r.name).sort((a,b)=>a.localeCompare(b,'pt-BR'));
 
 /* =========================================================
+   PRODUTIVIDADE — pontuação estimada a partir da carga real de
+   frentes (papel × projeto), ponderada por criticidade e status
+   do projeto. Sem dados de apontamento de horas/tarefas na base,
+   este é o proxy mais fiel de produtividade disponível na planilha.
+========================================================= */
+const CRIT_WEIGHT = {'Baixa':1,'Média':2,'Alta':3};
+const STATUS_WEIGHT = {'Backlog':0.3,'Levantando Requisitos':0.5,'Em andamento':1,'Pausado':0.4,'Concluído':1.2};
+function computeProductivity(){
+  const map = {};
+  PROJECTS.forEach(p=>{
+    const w = (CRIT_WEIGHT[p.crit]||1) * (STATUS_WEIGHT[p.status]!=null?STATUS_WEIGHT[p.status]:0.6);
+    ROLES.forEach(role=>{
+      p[role].forEach(name=>{
+        if(!map[name]) map[name] = {name, score:0, projectsSet:new Set()};
+        map[name].score += w;
+        map[name].projectsSet.add(p.id);
+      });
+    });
+  });
+  return Object.values(map).map(m=>({
+    name:m.name,
+    score:Math.round(m.score*10)/10,
+    projects:m.projectsSet.size
+  })).sort((a,b)=>b.score-a.score);
+}
+const PRODUCTIVITY = computeProductivity();
+
+/* =========================================================
    STATE / FILTERS
 ========================================================= */
-const state = { search:'', status:'', tipo:'', crit:'', profissional:'', sortCol:'nome', sortDir:1, mapSelectedPerson:null };
+const state = { search:'', status:'', tipo:'', crit:'', profissional:'', sortCol:'nome', sortDir:1, mapSelectedPerson:null, prodSearch:'', prodProject:'' };
 
 function matchesFilters(p){
   if(state.status && p.status!==state.status) return false;
@@ -504,12 +532,13 @@ function matchesFilters(p){
 ========================================================= */
 const NAV = [
  {id:'overview',label:'Visão Geral',icon:'overview'},
+ {id:'execucao-pa',label:'Execução do PA',icon:'layers',href:'execucao-pa.html'},
  {id:'projects',label:'Projetos',icon:'map'},
  {id:'pipeline',label:'Pipeline',icon:'pipeline'},
  {id:'team',label:'Equipes',icon:'users'},
  {id:'indicators',label:'Indicadores',icon:'chart'},
+ {id:'productivity',label:'Produtividade',icon:'trophy'},
  {id:'observations',label:'Observações',icon:'note'},
- {id:'productivity',label:'Produtividade',icon:'productivity'},
  {id:'reports',label:'Relatórios',icon:'doc'},
  {id:'settings',label:'Configurações',icon:'settings'}
 ];
@@ -523,7 +552,10 @@ function renderShell(){
       <div class="brand-text"><strong>Saúde Digital - SISD</strong><span>Gestão</span></div>
     </div>
     <nav class="sidebar-nav" id="sidebarNav">
-      ${NAV.map(n=>`<button class="nav-item" data-view="${n.id}">${icon(n.icon)}${n.label}</button>`).join('')}
+      ${NAV.map(n=>n.href
+        ? `<a class="nav-item" href="${n.href}">${icon(n.icon)}${n.label}</a>`
+        : `<button class="nav-item" data-view="${n.id}">${icon(n.icon)}${n.label}</button>`
+      ).join('')}
     </nav>
     <div class="sidebar-foot">
       <div class="foot-org">
@@ -561,7 +593,7 @@ function renderShell(){
     profSel.appendChild(o);
   });
 
-  document.querySelectorAll('.nav-item').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+  document.querySelectorAll('button.nav-item').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
   document.getElementById('menuToggle').addEventListener('click',()=>document.getElementById('sidebar').classList.toggle('open'));
   document.getElementById('globalSearch').addEventListener('input',e=>{state.search=e.target.value;refreshFilteredViews();});
   document.getElementById('fStatus').addEventListener('change',e=>{state.status=e.target.value;markActive('fStatus');refreshFilteredViews();});
@@ -588,8 +620,7 @@ function setView(id){
   currentView=id;
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
   document.getElementById('sidebar').classList.remove('open');
-  const renderers = {overview:renderOverview,projects:renderProjects,pipeline:renderPipeline,team:renderTeam,indicators:renderIndicators,observations:renderObservations,
-    productivity:renderProductivity,
+  const renderers = {overview:renderOverview,projects:renderProjects,pipeline:renderPipeline,team:renderTeam,indicators:renderIndicators,productivity:renderProductivity,observations:renderObservations,
     reports:renderReports,
     settings:()=>renderPlaceholder('Configurações',['Controle de permissões por perfil (gestor, PO, dev, QA)','Conexão direta à planilha/base de origem (atualização automática)','Personalização de campos, papéis e limites de capacidade'])};
   (renderers[id]||renderOverview)();
@@ -1241,6 +1272,99 @@ function renderIndicators(){
 }
 
 /* =========================================================
+   PRODUTIVIDADE
+========================================================= */
+function renderProductivity(){
+  const c = document.getElementById('content');
+  const projOpts = [...PROJECTS].sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'))
+    .map(p=>`<option value="${p.id}">${p.nome}</option>`).join('');
+  const profOpts = ALL_NAMES.map(n=>`<option value="${n}">${n} — ${ROSTER_BY_NAME[n].roleList.map(r=>ROLE_LABEL[r]).join(' + ')}</option>`).join('');
+
+  c.innerHTML = `
+  <div class="view-head"><div><h1>Produtividade</h1><p>Ranking estimado a partir da carga de frentes por profissional, ponderada pela criticidade e status de cada projeto.</p></div></div>
+  <div class="panel">
+    <div class="panel-head"><div><h3>Filtro de produtividade</h3><div class="sub">Selecione um profissional ou isole os profissionais de um projeto específico</div></div></div>
+    <div class="panel-body finder-panel">
+      <div class="finder-field">
+        <label>Profissional</label>
+        <select id="prodSearchProf"><option value="">Todos os profissionais</option>${profOpts}</select>
+      </div>
+      <div class="finder-field">
+        <label>Projeto</label>
+        <select id="prodFilterProject"><option value="">Todos os projetos</option>${projOpts}</select>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="prodClearFilters">Limpar filtros</button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><h3>Ranking dos profissionais mais produtivos</h3><div class="sub" id="prodRankingSub"></div></div></div>
+    <div class="panel-body" id="prodRanking"></div>
+  </div>
+  <div class="panel">
+    <div class="panel-head"><div><h3>Detalhamento por profissional</h3><div class="sub">Pontuação = soma, por papel e projeto, de (peso da criticidade × peso do status)</div></div></div>
+    <div class="panel-body table-wrap" id="prodTableWrap"></div>
+  </div>`;
+
+  injectBanner(c);
+  document.getElementById('prodSearchProf').value = state.prodSearch;
+  document.getElementById('prodFilterProject').value = state.prodProject;
+  document.getElementById('prodSearchProf').addEventListener('change', e=>{ state.prodSearch=e.target.value; renderProductivityBody(); });
+  document.getElementById('prodFilterProject').addEventListener('change', e=>{ state.prodProject=e.target.value; renderProductivityBody(); });
+  document.getElementById('prodClearFilters').addEventListener('click', ()=>{
+    state.prodSearch=''; state.prodProject='';
+    document.getElementById('prodSearchProf').value='';
+    document.getElementById('prodFilterProject').value='';
+    renderProductivityBody();
+  });
+  renderProductivityBody();
+}
+function renderProductivityBody(){
+  let list = [...PRODUCTIVITY];
+  if(state.prodProject){
+    const pid = parseInt(state.prodProject);
+    const proj = PROJECTS.find(p=>p.id===pid);
+    const peopleOnProj = proj ? new Set(allPeopleOf(proj)) : new Set();
+    list = list.filter(m=>peopleOnProj.has(m.name));
+  }
+  if(state.prodSearch){
+    list = list.filter(m=>m.name===state.prodSearch);
+  }
+
+  const subEl = document.getElementById('prodRankingSub');
+  if(subEl) subEl.textContent = `${list.length} profissional(is) no ranking`;
+
+  const top = list.slice(0,10);
+  const maxScore = Math.max(1, ...top.map(m=>m.score));
+  const medal = i => i===0?{bg:'#F5C344',fg:'#5C4400'} : i===1?{bg:'#C9D1DB',fg:'#3A4250'} : i===2?{bg:'#E3A36B',fg:'#5A3111'} : {bg:'var(--gray-100)',fg:'var(--gray-600)'};
+  document.getElementById('prodRanking').innerHTML = top.length ? `<div class="bars-list">
+    ${top.map((m,i)=>{
+      const r = ROSTER_BY_NAME[m.name];
+      const md = medal(i);
+      return `<div class="bars-row" style="grid-template-columns:26px 160px 1fr 50px">
+        <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;font-size:10.5px;font-weight:800;background:${md.bg};color:${md.fg}">${i+1}</span>
+        <span class="lbl" style="display:flex;align-items:center;gap:6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${avatar(m.name,r.roleList[0],20)}${m.name}</span>
+        <div class="bars-track"><div class="bars-fill" style="width:${m.score/maxScore*100}%;background:${i<3?'var(--accent)':'var(--blue-600)'}"></div></div>
+        <span style="font-weight:700;color:var(--navy-900);text-align:right">${m.score}</span>
+      </div>`;
+    }).join('')}
+  </div>` : '<p class="cell-muted">Nenhum profissional corresponde aos filtros aplicados.</p>';
+
+  document.getElementById('prodTableWrap').innerHTML = `<table class="data-table">
+    <thead><tr><th>#</th><th>Profissional</th><th>Papéis</th><th>Projetos</th><th>Pontuação</th></tr></thead>
+    <tbody>${list.map((m,i)=>{
+      const r = ROSTER_BY_NAME[m.name];
+      return `<tr>
+        <td class="cell-muted">${i+1}</td>
+        <td class="proj-name-cell"><strong>${m.name}</strong></td>
+        <td class="cell-muted">${r.roleList.map(rl=>ROLE_LABEL[rl]).join(', ')}</td>
+        <td class="people-count">${m.projects} projeto(s)</td>
+        <td style="font-weight:700;color:var(--navy-900)">${m.score}</td>
+      </tr>`;
+    }).join('') || `<tr><td colspan="5" class="cell-muted" style="padding:20px;text-align:center">Nenhum profissional corresponde aos filtros aplicados.</td></tr>`}
+    </tbody></table>`;
+}
+
+/* =========================================================
    OBSERVAÇÕES
 ========================================================= */
 function renderObservations(){
@@ -1265,353 +1389,6 @@ function renderObservations(){
     <div class="obs-card-head"><strong>${p.nome}</strong>${statusTag(p.status)}${critTag(p.crit)}</div>
     <div class="obs-text">${p.obs}</div>
   </div>`).join('') : '<p class="cell-muted">Nenhuma observação registrada.</p>';
-}
-
-/* =========================================================
-   PRODUTIVIDADE — base: Horas Redmine 01/06/2026–30/06/2026
-========================================================= */
-const PRODUCTIVITY_DATA = [
-  {"profissional":"ADAILTON DE JESUS CERQUEIRA JUNIOR","atuacao":"SCRUM MASTER","vinculo":"PRODEB","jornada":"PRESENCIAL","horasTrabalhadas":"33.75","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ADILTON FRAGA SEIXAS","atuacao":"DESENVOLVEDOR SÊNIOR","vinculo":"PRODEB","jornada":"HOME FULL","horasTrabalhadas":"27.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ALAN DOS SANTOS SAMPAIO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"69.74","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ALAN TIAGO ANDRADE","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"9.93","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ALEXANDRE MUASSAB FERRARI TIRIBA","atuacao":"DESENVOLVEDOR JÚNIOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"39.15","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANA VICTÓRIA SILVA LOPES CARLOS","atuacao":"ANALISTA DE TESTES","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"87.72","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANDRÉ LUIS SOARES DE FREITAS SOUZA","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"60.05","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANDRÉ SANTOS NERI","atuacao":"DESENVOLVEDOR SÊNIOR","vinculo":"PRODEB","jornada":"HIBRIDO","horasTrabalhadas":"11.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANDRÉ VIEIRA OTTONI","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"20.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ÂNTONIO NERI","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"47.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANGELO DO NASCIMENTO JUNIOR","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"8.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ARTHUR VIEIRA E SILVA","atuacao":"ANALISTA DE TESTES","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"49.62","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"CARLOS ALVES DE FREITAS JUNIOR","atuacao":"G.P PLENO I","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"CAROLINE DE SOUZA DOS SANTOS","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"129.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"CRISTIAN DOS SANTOS GOMES DA SILVA","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"0.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"DANIEL CARVALHO DOS SANTOS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"85.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"DELIVELTON TEIXEIRA RODRIGUES","atuacao":"AGHUSE - DESENVOLVEDOR SÊNIOR","vinculo":"PRODEB","jornada":"HOME FULL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"EDGLEIDSON FERREIRA DE JESUS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"122.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ELIZA INÊZ AMORIM BRITO","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"2.33","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ELISA CRISTINA CUNHA DE SOUZA","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"EMANUELLE LÔBO E SANT'ANA","atuacao":"LIDER TECNICA","vinculo":"PRODEB","jornada":"PRESENCIAL","horasTrabalhadas":"0.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"FABIANA PEREIRA GRANJA","atuacao":"PRODUCT OWNER","vinculo":"PRODEB","jornada":"HIBRIDO","horasTrabalhadas":"12.20","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"FABRICIO DE CARVALHO SOUZA","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"128.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"FELIPE BARROS DE SOUSA","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"8.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"FELIPE SABÓIA NAZARÉ","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"86.67","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"FILIPE ROSÁRIO DE ASSIS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"120.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"GABRIEL MOREIRA CORREA DE SOUZA","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"28.67","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"GEISON BATISTA DOS SANTOS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"42.42","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"GEOVANE SILVA DOS SANTOS","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"1.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"GILCLEI SOARES DE ARAÚJO","atuacao":"DESENVOLVEDOR SÊNIOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"96.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ISADORA SILVA DA CRUZ","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"30.17","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JADE NEVES DA SILVA","atuacao":"LIDER TECNICA - AGHUSE","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"14.37","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JAKELINE DO NASCIMENTO OLIVEIRA","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JAMISON DE SOUSA QUEIROZ","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"54.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOÁS NOGUEIRA DOS SANTOS MAGALHÃES","atuacao":"DESENVOLVEDOR PHP PLENO 3","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"46.35","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOÃO VICTOR LIMA CONCEIÇÃO","atuacao":"DESENVOLVEDOR SÊNIOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"88.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOÃO VICTOR MAGALHÃES DE CARVALHO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"60.30","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOÃO FELISBERTO LIMA DE ABREU FARIAS","atuacao":"ASSESSOR TÉCNICO","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOSAFÁ MOURA CALDAS","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"44.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JOICE DE ARAUJO NUNES","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"99.76","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"JULIANA MATOS DE JESUS SANTOS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"29.40","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LAIS BATISTA SILVA","atuacao":"ANALISTA DE TESTES JUNIOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"74.19","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LETÍCIA DE OLIVEIRA GOMES","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"2.15","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LIAN EZEQUIEL SOUZA DE CASTRO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"53.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LUCAS VENTURA FERRAZ NOGUEIRA","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"1.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LUIZ HENRIQUE CARVALHO BORGES","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"MARIA ISABEL DE MELO REIS","atuacao":"ANALISTA DE TESTES JUNIOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"48.84","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"MARLO MARQUES DA SILVA FILHO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"15.33","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"MAILA VALVERDE COSTA","atuacao":"PRODUCT OWNER","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"1.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"PEDRO AMARAL BRANDÃO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"47.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"PRISCILA VINHAS MACEDO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"16.73","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RAFAEL GIOVANNI DANTAS DOS SANTOS","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RAÍSSA GONÇALVES REGUEIRA PENELÚC","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"55.85","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RAUL PASSOS DA ENCARNAÇÃO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"57.30","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RODRIGO ALVES VAZ","atuacao":"LÍDER TÉCNICO - BI","vinculo":"PRODEB","jornada":"PRESENCIAL","horasTrabalhadas":"48.00","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RODRIGO LADISLAU DA SILVA","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"1.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"RODRIGO NASCIMENTO HELLSTROM","atuacao":"PRODUCT OWNER","vinculo":"PRODEB","jornada":"HIBRIDO","horasTrabalhadas":"2.33","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"SANDRO WESLEI SANTOS GOES","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"40.48","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"SHEYLA CASTRO NUNES DE SOUZA","atuacao":"SCRUM MASTER","vinculo":"FESF SUS","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"SILVANA CRISTINA BRAGA DAS CHAGAS","atuacao":"ANALISTA DE NEGÓCIOS","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"1.50","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"TARCÍSIO SILVA DE ARAÚJO","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"VANYLE SILVA PEREIRA","atuacao":"PRODUCT OWNER","vinculo":"CARGO","jornada":"PRESENCIAL","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"VITOR COSTA MENEZES","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HOME FULL","horasTrabalhadas":"131.68","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"WAGNER CAFEZEIRO MOREIRA DA SILVA","atuacao":"DESENVOLVEDOR","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"YURI DE JESUS GOES","atuacao":"ANALISTA DE TESTES","vinculo":"FESF SUS","jornada":"HIBRIDO","horasTrabalhadas":"95.32","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LUCAS CERQUEIRA","atuacao":"DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ANGELA SANCHES","atuacao":"SCRUM MASTER","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"MARCELO SANTANA","atuacao":"SCRUM MASTER","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"PEDRO CARVALHO","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"KELSON BORGES","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"ROBERTO BERNARDES","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"CARLOS MARQUES","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"LUIS BISET","atuacao":"AGHUSE - DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"},
-  {"profissional":"PATRÍCIA","atuacao":"DESENVOLVEDOR","vinculo":"","jornada":"","horasTrabalhadas":"Sem horas","periodo":"01/06/2026 – 30/06/2026"}
-];
-
-const prodState = { profissional: '', atuacao: '', periodo: '' };
-
-/* Extrai "MM/YYYY" do campo periodo ex: "01/06/2026 – 30/06/2026" → "06/2026" */
-function prodPeriodoKey(p){
-  if(!p) return '';
-  const m = p.match(/(\d{2})\/(\d{4})/);
-  return m ? `${m[1]}/${m[2]}` : p;
-}
-
-const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-function prodPeriodoLabel(key){
-  if(!key) return key;
-  const [mm, yyyy] = key.split('/');
-  return `${MESES[parseInt(mm,10)-1]} / ${yyyy}`;
-}
-
-function renderProductivity(){
-  const c = document.getElementById('content');
-  const nomes = [...new Set(PRODUCTIVITY_DATA.map(d=>d.profissional))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  const atuacoes = [...new Set(PRODUCTIVITY_DATA.map(d=>d.atuacao))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
-  const periodos = [...new Set(PRODUCTIVITY_DATA.map(d=>prodPeriodoKey(d.periodo)))].sort().reverse();
-
-  /* Pré-seleciona o período mais recente se nenhum estiver selecionado */
-  if(!prodState.periodo && periodos.length) prodState.periodo = periodos[0];
-
-  c.innerHTML = `
-  <div class="view active" id="viewProductivity">
-    <div class="view-head">
-      <div>
-        <h1>Produtividade</h1>
-        <p>Horas apontadas no Redmine${prodState.periodo ? ' · ' + prodPeriodoLabel(prodState.periodo) : ''}</p>
-      </div>
-    </div>
-
-    <!-- KPIs rápidos -->
-    <div id="prodKpis" style="margin-bottom:20px;"></div>
-
-    <!-- Filtros -->
-    <div class="panel" style="margin-bottom:20px;">
-      <div class="panel-head"><h3>Filtros</h3></div>
-      <div class="panel-body">
-        <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:flex-end;">
-
-          <div class="finder-field" style="flex:0 0 200px;min-width:160px;">
-            <label>Período (Mês / Ano)</label>
-            <select id="prodFilterPeriodo" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
-              <option value="">Todos os períodos</option>
-              ${periodos.map(p=>`<option value="${p}"${prodState.periodo===p?' selected':''}>${prodPeriodoLabel(p)}</option>`).join('')}
-            </select>
-          </div>
-
-          <div class="finder-field" style="flex:1;min-width:200px;">
-            <label>Profissional</label>
-            <select id="prodFilterProfissional" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
-              <option value="">Todos os profissionais</option>
-              ${nomes.map(n=>`<option value="${n}"${prodState.profissional===n?' selected':''}>${n}</option>`).join('')}
-            </select>
-          </div>
-
-          <div class="finder-field" style="flex:1;min-width:180px;">
-            <label>Atuação</label>
-            <select id="prodFilterAtuacao" class="filter-select" style="width:100%;max-width:none;font-size:13px;padding:9px 11px;">
-              <option value="">Todas as atuações</option>
-              ${atuacoes.map(a=>`<option value="${a}"${prodState.atuacao===a?' selected':''}>${a}</option>`).join('')}
-            </select>
-          </div>
-
-          <div style="display:flex;gap:8px;padding-bottom:1px;">
-            <button class="btn btn-primary" id="prodBtnFiltrar">${icon('search')}Filtrar</button>
-            <button class="btn btn-ghost" id="prodBtnLimpar">Limpar</button>
-            <button class="btn btn-ghost" id="prodBtnExportPDF">${icon('download')}Exportar PDF</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tabela -->
-    <div id="prodResultado"></div>
-  </div>`;
-
-  renderProdKpis();
-  renderProdTabela();
-
-  document.getElementById('prodFilterPeriodo').addEventListener('change', e=>{ prodState.periodo=e.target.value; });
-  document.getElementById('prodFilterProfissional').addEventListener('change', e=>{ prodState.profissional=e.target.value; });
-  document.getElementById('prodFilterAtuacao').addEventListener('change', e=>{ prodState.atuacao=e.target.value; });
-  document.getElementById('prodBtnFiltrar').addEventListener('click', ()=>{ renderProdTabela(); renderProdKpis(); });
-  document.getElementById('prodBtnLimpar').addEventListener('click', ()=>{
-    const periodos2 = [...new Set(PRODUCTIVITY_DATA.map(d=>prodPeriodoKey(d.periodo)))].sort().reverse();
-    prodState.profissional=''; prodState.atuacao=''; prodState.periodo=periodos2[0]||'';
-    document.getElementById('prodFilterProfissional').value='';
-    document.getElementById('prodFilterAtuacao').value='';
-    document.getElementById('prodFilterPeriodo').value=prodState.periodo;
-    renderProdTabela(); renderProdKpis();
-  });
-  document.getElementById('prodBtnExportPDF').addEventListener('click', exportProductivityPDF);
-  injectViewExportButton();
-}
-
-function prodFiltered(){
-  let data = PRODUCTIVITY_DATA;
-  if(prodState.periodo) data = data.filter(d=>prodPeriodoKey(d.periodo)===prodState.periodo);
-  if(prodState.profissional) data = data.filter(d=>d.profissional===prodState.profissional);
-  if(prodState.atuacao) data = data.filter(d=>d.atuacao===prodState.atuacao);
-  return data;
-}
-
-function prodHoras(h){
-  if(!h || h==='Sem horas') return 0;
-  return parseFloat(h)||0;
-}
-
-function renderProdKpis(){
-  const base = prodFiltered();
-  const total = base.length;
-  const comHoras = base.filter(d=>d.horasTrabalhadas!=='Sem horas' && parseFloat(d.horasTrabalhadas)>0).length;
-  const semHoras = total - comHoras;
-  const totalH = base.reduce((s,d)=>s+prodHoras(d.horasTrabalhadas),0);
-  const media = comHoras>0?(totalH/comHoras).toFixed(1):0;
-
-  document.getElementById('prodKpis').innerHTML = `
-  <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);">
-    <div class="kpi-card" style="--kc:var(--accent)">
-      <div class="kpi-top"><div class="kpi-icon" style="background:var(--accent-100)">${icon('users')}</div></div>
-      <div class="kpi-val">${total}</div>
-      <div class="kpi-label">Profissionais</div>
-    </div>
-    <div class="kpi-card" style="--kc:var(--green)">
-      <div class="kpi-top"><div class="kpi-icon" style="background:var(--green-100)">${icon('chart')}</div></div>
-      <div class="kpi-val">${comHoras}</div>
-      <div class="kpi-label">Com horas apontadas</div>
-    </div>
-    <div class="kpi-card" style="--kc:var(--amber)">
-      <div class="kpi-top"><div class="kpi-icon" style="background:var(--amber-100)">${icon('alert')}</div></div>
-      <div class="kpi-val">${semHoras}</div>
-      <div class="kpi-label">Sem horas apontadas</div>
-    </div>
-    <div class="kpi-card" style="--kc:var(--blue-600)">
-      <div class="kpi-top"><div class="kpi-icon" style="background:var(--blue-100)">${icon('download')}</div></div>
-      <div class="kpi-val">${totalH.toFixed(1)}</div>
-      <div class="kpi-label">Total de horas · média ${media}h</div>
-    </div>
-  </div>`;
-}
-
-function renderProdTabela(){
-  const data = prodFiltered();
-  const el = document.getElementById('prodResultado');
-  if(!data.length){
-    el.innerHTML=`<div class="placeholder-panel">${icon('search')}<h3>Nenhum registro encontrado</h3><p>Ajuste os filtros.</p></div>`;
-    return;
-  }
-  const rows = data.map(d=>{
-    const h = prodHoras(d.horasTrabalhadas);
-    const semH = d.horasTrabalhadas==='Sem horas';
-    const horasTag = semH
-      ? `<span style="background:var(--amber-100);color:var(--amber);font-weight:700;padding:2px 8px;border-radius:6px;font-size:11px;">Sem horas</span>`
-      : `<strong style="color:var(--navy-900)">${h.toFixed(2)}h</strong>`;
-    return `<tr>
-      <td><strong style="font-size:12.5px">${d.profissional}</strong></td>
-      <td><span style="font-size:11.5px;color:var(--gray-600)">${d.atuacao}</span></td>
-      <td><span style="font-size:11.5px">${d.vinculo}</span></td>
-      <td><span style="font-size:11.5px">${d.jornada}</span></td>
-      <td style="text-align:right">${horasTag}</td>
-      <td style="font-size:11.5px;color:var(--gray-500)">${d.periodo}</td>
-    </tr>`;
-  }).join('');
-
-  el.innerHTML=`
-  <div class="panel">
-    <div class="panel-head">
-      <h3>Horas por Profissional</h3>
-      <span class="sub">${data.length} profissional(is)</span>
-    </div>
-    <div class="panel-body table-wrap">
-      <table class="data-table" style="min-width:800px">
-        <thead><tr>
-          <th>Profissional</th>
-          <th>Atuação</th>
-          <th>Vínculo</th>
-          <th>Jornada</th>
-          <th style="text-align:right">Horas Apontadas</th>
-          <th>Período</th>
-        </tr></thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  </div>`;
-}
-
-function exportProductivityPDF(){
-  if(!window.jspdf?.jsPDF){ toast('Biblioteca de PDF ainda carregando — tente em alguns segundos.'); return; }
-  const btn = document.getElementById('prodBtnExportPDF');
-  try{
-    if(btn){ btn.disabled=true; btn.textContent='Gerando...'; }
-    const {jsPDF} = window.jspdf;
-    const pdf = new jsPDF({orientation:'landscape', unit:'mm', format:'a4'});
-    const data = prodFiltered();
-    const ts = new Date().toLocaleDateString('pt-BR');
-    const periodo = data[0]?.periodo || '01/06/2026 – 30/06/2026';
-
-    // Cabeçalho
-    pdf.setFillColor(10, 27, 51);
-    pdf.rect(0, 0, 297, 18, 'F');
-    pdf.setTextColor(255,255,255);
-    pdf.setFontSize(13); pdf.setFont('helvetica','bold');
-    pdf.text('Saúde Digital - SISD · Produtividade', 14, 11);
-    pdf.setFontSize(8); pdf.setFont('helvetica','normal');
-    pdf.text(`Período: ${periodo}   ·   Emitido em: ${ts}   ·   ${data.length} profissional(is)`, 14, 16);
-
-    // KPIs linha
-    const comH = data.filter(d=>d.horasTrabalhadas!=='Sem horas'&&parseFloat(d.horasTrabalhadas)>0).length;
-    const semH = data.length - comH;
-    const totalH = data.reduce((s,d)=>s+prodHoras(d.horasTrabalhadas),0);
-    const media = comH>0?(totalH/comH).toFixed(1):0;
-    pdf.setTextColor(10,27,51);
-    pdf.setFontSize(9); pdf.setFont('helvetica','bold');
-    pdf.text(`Total profissionais: ${data.length}   |   Com horas: ${comH}   |   Sem horas: ${semH}   |   Total: ${totalH.toFixed(2)}h   |   Média: ${media}h`, 14, 25);
-
-    // Tabela com AutoTable
-    pdf.autoTable({
-      startY: 30,
-      head: [['Profissional','Atuação','Vínculo','Jornada','Horas Apontadas','Período']],
-      body: data.map(d=>[
-        d.profissional,
-        d.atuacao,
-        d.vinculo,
-        d.jornada,
-        d.horasTrabalhadas==='Sem horas'?'Sem horas':`${parseFloat(d.horasTrabalhadas).toFixed(2)}h`,
-        d.periodo
-      ]),
-      styles:{ fontSize:8, cellPadding:3, overflow:'linebreak' },
-      headStyles:{ fillColor:[10,27,51], textColor:255, fontStyle:'bold', fontSize:8 },
-      columnStyles:{
-        0:{cellWidth:60},
-        1:{cellWidth:52},
-        2:{cellWidth:22},
-        3:{cellWidth:24},
-        4:{cellWidth:28, halign:'right'},
-        5:{cellWidth:38}
-      },
-      alternateRowStyles:{ fillColor:[247,249,251] },
-      didParseCell(info){
-        if(info.column.index===4 && info.cell.raw==='Sem horas' && info.section==='body'){
-          info.cell.styles.textColor=[181,121,10];
-          info.cell.styles.fontStyle='bold';
-        }
-      },
-      margin:{left:14, right:14},
-      didDrawPage(d2){
-        // rodapé em cada página
-        const pg = pdf.internal.getNumberOfPages();
-        pdf.setFontSize(7); pdf.setTextColor(140,140,140);
-        pdf.text(`Página ${d2.pageNumber}`, 283, 205, {align:'right'});
-      }
-    });
-
-    pdf.save(`produtividade_${ts.replace(/\//g,'-')}.pdf`);
-    toast('PDF exportado com sucesso!');
-  } catch(e){
-    toast('Erro ao gerar PDF.');
-    console.error(e);
-  } finally{
-    if(btn){ btn.disabled=false; btn.innerHTML=`${icon('download')}Exportar PDF`; }
-  }
 }
 
 /* =========================================================
