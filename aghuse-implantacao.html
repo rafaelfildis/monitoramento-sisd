@@ -181,6 +181,13 @@ const SIT_META = {
 };
 const SIT_ORDER = ['Em andamento','Em planejamento','Prevista','Pausada'];
 
+const TIPO_COLOR_PALETTE = ['var(--blue-600)','var(--accent)','#8B5CF6','var(--orange)','#DB2777','var(--gray-600)'];
+const TIPO_ORDER = Object.entries(
+  UNITS_RAW.reduce((acc,u)=>{ if(u.tipo){ acc[u.tipo]=(acc[u.tipo]||0)+1; } return acc; }, {})
+).sort((a,b)=>b[1]-a[1]).map(([tipo])=>tipo);
+const TIPO_META = {};
+TIPO_ORDER.forEach((t,i)=>{ TIPO_META[t] = {color: TIPO_COLOR_PALETTE[i % TIPO_COLOR_PALETTE.length]}; });
+
 const fmtInt = v => new Intl.NumberFormat('pt-BR').format(v||0);
 const pct = v => (isFinite(v)? (v*100).toFixed(1):'0.0')+'%';
 
@@ -306,6 +313,13 @@ function setSituacao(s){
   renderContent();
 }
 
+function setTipo(t){
+  state.tipo = state.tipo===t ? '' : t;
+  document.getElementById('fTipo').value = state.tipo;
+  markActive('fTipo');
+  renderContent();
+}
+
 function kpiCard(color, val, label, sub){
   return `<div class="kpi-card" style="--kc:${color}">
     <div class="kpi-val">${val}</div>
@@ -331,6 +345,18 @@ function renderSituacaoTabs(list){
     const active = state.situacao===s;
     return `<button class="sit-tab ${active?'active':''}" style="--sc:${meta.color};--sbg:${meta.bg}" data-sit="${s}">
       <div class="st-label"><span>${meta.label}</span><span class="st-count" style="background:${meta.color}">${st.bySit[s]}</span></div>
+      <div class="st-sub">unidades</div>
+    </button>`;
+  }).join('')}</div>`;
+}
+
+function renderTipoTabs(list){
+  return `<div class="sit-tabs tipo-tabs">${TIPO_ORDER.map(t=>{
+    const meta = TIPO_META[t];
+    const active = state.tipo===t;
+    const count = list.filter(u=>u.tipo===t).length;
+    return `<button class="sit-tab ${active?'active':''}" style="--sc:${meta.color};--sbg:${meta.color}1a" data-tipo="${t}">
+      <div class="st-label"><span>${t.toUpperCase()}</span><span class="st-count" style="background:${meta.color}">${count}</span></div>
       <div class="st-sub">unidades</div>
     </button>`;
   }).join('')}</div>`;
@@ -426,6 +452,7 @@ function renderContent(){
     </div>
     ${renderSituacaoTabs(list)}
     ${renderKPIs(list)}
+    ${renderTipoTabs(list)}
     <div class="panel">
       <div class="panel-head">
         <div>
@@ -437,7 +464,8 @@ function renderContent(){
     </div>
   `;
 
-  document.querySelectorAll('.sit-tab').forEach(el=>el.addEventListener('click',()=>setSituacao(el.dataset.sit)));
+  document.querySelectorAll('.sit-tab[data-sit]').forEach(el=>el.addEventListener('click',()=>setSituacao(el.dataset.sit)));
+  document.querySelectorAll('.sit-tab[data-tipo]').forEach(el=>el.addEventListener('click',()=>setTipo(el.dataset.tipo)));
   document.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',()=>{
     const id = Number(el.dataset.toggle);
     if(expanded.has(id)) expanded.delete(id); else expanded.add(id);
