@@ -2074,9 +2074,11 @@ function openNewProjectModal(){
   document.getElementById('modalBg').classList.add('active');
 }
 function closeModal(){ document.getElementById('modalBg').classList.remove('active'); }
+if('scrollRestoration' in history){ history.scrollRestoration = 'manual'; }
 document.addEventListener('DOMContentLoaded', ()=>{
   renderShell();
   setView('overview');
+  window.scrollTo(0,0);
   document.getElementById('modalSave').addEventListener('click', ()=>{
     const nome = document.getElementById('npName').value.trim();
     if(!nome){ toast('Informe o nome do projeto.'); return; }
