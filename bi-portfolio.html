@@ -361,7 +361,8 @@ const ICON = {
   note:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 4h11l3 3v13H5z"/><path d="M16 4v3h3M8 11h8M8 15h5"/></svg>',
   arrowRight:'<svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
   user:'<svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-6.5 7-6.5s7 2.9 7 6.5"/></svg>',
-  trophy:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10v3.2a5 5 0 0 1-10 0V4z"/><path d="M7 5.2H4.6A2.6 2.6 0 0 0 7 9M17 5.2h2.4A2.6 2.6 0 0 1 17 9"/><path d="M12 12.2v2.8M9.4 20h5.2M9.9 17h4.2v1.4a1.4 1.4 0 0 1-1.4 1.4h-1.4a1.4 1.4 0 0 1-1.4-1.4V17z"/></svg>'
+  trophy:'<svg viewBox="0 0 24 24" fill="none"><path d="M7 4h10v3.2a5 5 0 0 1-10 0V4z"/><path d="M7 5.2H4.6A2.6 2.6 0 0 0 7 9M17 5.2h2.4A2.6 2.6 0 0 1 17 9"/><path d="M12 12.2v2.8M9.4 20h5.2M9.9 17h4.2v1.4a1.4 1.4 0 0 1-1.4 1.4h-1.4a1.4 1.4 0 0 1-1.4-1.4V17z"/></svg>',
+  badge:'<svg viewBox="0 0 24 24" fill="none"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M9 5V3.6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1V5"/><circle cx="12" cy="11.4" r="2.4"/><path d="M8 18c.6-2 2.2-3.2 4-3.2s3.4 1.2 4 3.2"/></svg>'
 };
 function icon(name){return ICON[name]||'';}
 
@@ -513,43 +514,366 @@ const PRODUCTIVITY = computeProductivity();
    (base: planilha "Atualização Cadastral Servidores.xlsx",
    abas CGTICS e Implantação, atualizada em 08/07/2026)
 ========================================================= */
-const SERVIDORES_SISD = {
-  cgtics: 200,
-  implantacao: 122,
-  aghuseSites: 37,
-  setoresCgtics: [
-    {nome:'COSIS', val:107},
-    {nome:'COSTEC', val:33},
-    {nome:'COINFRA', val:23},
-    {nome:'DGIS', val:7},
-    {nome:'DA', val:7},
-    {nome:'COPLAN', val:7},
-    {nome:'Assessoria Especial', val:6},
-    {nome:'ASCOM', val:3},
-    {nome:'Outros', val:7}
-  ],
-  vinculos: [
-    {nome:'FESF-SUS', val:250},
-    {nome:'Cargo Comissionado', val:20},
-    {nome:'FESF-SUS (PPE)', val:14},
-    {nome:'CRETA', val:13},
-    {nome:'PRODEB', val:12},
-    {nome:'Outros', val:13}
-  ],
-  sexoCgtics: {MASCULINO:126, FEMININO:73, 'Não informado':1},
-  cargosImplantacao: [
-    {nome:'Operador de Sistemas de Informática', val:74},
-    {nome:'Consultor de Tecnologia da Informação', val:43},
-    {nome:'Apoio Administrativo', val:4},
-    {nome:'Gestor de Unidade de Contrato', val:1}
-  ]
-};
-SERVIDORES_SISD.total = SERVIDORES_SISD.cgtics + SERVIDORES_SISD.implantacao;
+const SERVIDORES = [
+ {"nome":"Adailton De Jesus Cerqueira", "area":"CGTICS", "cargo":"Consultor em Transformação Digital II", "contrato":"", "funcao":"Scrum Master", "contato":"(71) 99335-7869", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Adilton Fraga Seixas", "area":"CGTICS", "cargo":"Consultor em Transformação Digital", "contrato":"", "funcao":"Desenvolvedor - Sênior", "contato":"(71) 99256-8126", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Alan dos Santos Sampaio", "area":"CGTICS", "cargo":"Analista de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor - Sênior I", "contato":"(71) 9 9218-3436", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Alan Tiago Andrade", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 9 8863-7004", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Alef Freitas Curtes Andrade", "area":"CGTICS", "cargo":"Recepcionista", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Alexandre Muassab Ferrari Tiriba", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior II", "contato":"(71) 9 8149-4945", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Alexandre Santos da Silva", "area":"CGTICS", "cargo":"Gestor de Unidades I", "contrato":"002/25", "funcao":"Diretor de Gestão da Informação em Saúde", "contato":"", "vinculo":"FESF-SUS", "setor":"DGIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Aline Sacramento Ribeiro da Silva", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Alysson Machado Rezende Vidal", "area":"CGTICS", "cargo":"Analista de Sistemas", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - PLENO I", "contato":"(71) 9 9905-3588", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Amaury Pereira de Oliveira", "area":"CGTICS", "cargo":"Consultor em Transformação Digital II", "contrato":"", "funcao":"Administrador de Banco de Dados - DBA", "contato":"", "vinculo":"PRODEB", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Ana Beatriz Santos de Jesus", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Ana Victória Silva Lopes Carlos", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JÚNIOR II", "contato":"(71) 9 8891-9379", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Anailton dos Santos Góes Silva", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Analista de Servidores", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"André Alves dos Santos", "area":"CGTICS", "cargo":"Analistra de Infraestrutura", "contrato":"", "funcao":"Analista", "contato":"", "vinculo":"PROSUS", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"André Luis Soares de Freitas Souza", "area":"CGTICS", "cargo":"Analista de Sistemas", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - PLENO II", "contato":"(71) 96336-4379", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"André Reis da Silva", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Sênior I", "contato":"(71) 99282-6606", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"André Santos Neri", "area":"CGTICS", "cargo":"Consultor em Transformação Digital II", "contrato":"", "funcao":"Líder Técnico Back", "contato":"(71) 99600-7148", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"André Vieira Ottoni", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor - Júnior I", "contato":"(75) 98324-9284", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Andressa de Jesus Barreto", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Ângela Regina do Sacramento Silva", "area":"CGTICS", "cargo":"Operador de Sistemas Informática Jr.", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Angela Sanches Alves", "area":"CGTICS", "cargo":"Gerente de Sistemas e Metódos Administrativos", "contrato":"002/25", "funcao":"Scrum Master - Sênior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"", "nivel":""},
+ {"nome":"Angelo do Nascimento Junior", "area":"CGTICS", "cargo":"Gerente de Sistemas e Metódos Administrativos", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 9 9916-4895", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Anibal Amorim dos Santos", "area":"CGTICS", "cargo":"Técnico", "contrato":"", "funcao":"Técnico de Servidores", "contato":"", "vinculo":"PRODEB", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Antônio Neri", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Scrum Master - Pleno I", "contato":"(71) 99137-0313", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Arthur Vieira e Silva", "area":"CGTICS", "cargo":"Desenvolvedor", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior II", "contato":"(71) 99181-8370", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Augusto Cesar Santos de Souza", "area":"CGTICS", "cargo":"Secretário Administrativo I", "contrato":"", "funcao":"Técnico de Conectividade", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Bernardo Primo Viana Braga", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JÚNIOR III", "contato":"(71) 98752-0898", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Bianca Brito Cruz", "area":"CGTICS", "cargo":"Cientista de Dados", "contrato":"002/25", "funcao":"Cientista de dados Júnior III", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Bruna dos Santos Matos", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - PLENO I", "contato":"(71) 98322-5574", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Bruna Ribeiro Silva", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Assesora Técnica da Gestão", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DGIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Caio Costa Cavalcante", "area":"CGTICS", "cargo":"Técnico Analista de TI", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"REDA", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Bruna Zantedeschi", "area":"CGTICS", "cargo":"GESTOR DE UNIDADE DE TRABALHO II", "contrato":"002/25", "funcao":"Gestora de Contrato", "contato":"", "vinculo":"FESF-SUS", "setor":"FESF", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Carla de Almeida Braga", "area":"CGTICS", "cargo":"Técnico de Apoio ao Usuário", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Carla Santos Maciel", "area":"CGTICS", "cargo":"Apoio Administrativo I", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COPLAN", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Carlos Alves de Freitas Junior", "area":"CGTICS", "cargo":"Analista de Geo", "contrato":"002/25", "funcao":"Gerente de Projetos - Pleno I", "contato":"(71) 9738-7577", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Carlos Augusto Costa dos Santos Junior", "area":"CGTICS", "cargo":"AnalistaUX/UI", "contrato":"002/25", "funcao":"Gerente de Projetos - Pleno I", "contato":"(71) 9 87635573", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Carlos Marques", "area":"CGTICS", "cargo":"Desenvolvedor", "contrato":"002/25", "funcao":"Desenvolvedor Java - Sênior I", "contato":"(71)9 8314-4282", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Carolina Valéria Viana de Souza Santos", "area":"CGTICS", "cargo":"Operador de Sistemas Informática", "contrato":"003/25", "funcao":"Suporte - AGHUse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Caroline de Souza dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior II", "contato":"(71) 9 8260-9599", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Cintia dos Santos Oliveira", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Claudio Lima de Oliveira", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"003/25", "funcao":"Técnico de Servidores e Conectividade", "contato":"", "vinculo":"CRETA", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Cristhofer Silva de Jesus", "area":"CGTICS", "cargo":"Técnico Apoio Usuário Informática Jr.", "contrato":"003/25", "funcao":"Líder Técnico - Costec", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Cristian dos Santos Gomes da Silva", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JÚNIOR II", "contato":"(71) 9 9396-4517", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Daniel Campos de Meneses", "area":"CGTICS", "cargo":"Programador Comunic Sist. BI Pleno II", "contrato":"002/25", "funcao":"Coordenador de Inovação", "contato":"(71) 98345-9563", "vinculo":"FESF-SUS", "setor":"ASSESSORIA ESPECIAL", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Daniel Carvalho dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor - Pleno I", "contato":"(71) 99316-4736", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Danilo Fernando Barbosa Lima", "area":"CGTICS", "cargo":"Ténico Apoio Usuário Informática Júnior II", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Deivisson Almeida Sobral", "area":"CGTICS", "cargo":"Desenvolvedor Pleno", "contrato":"003/25", "funcao":"Líder Técnico - Costec", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Delivelton Teixeira Rodrigues", "area":"CGTICS", "cargo":"Analista de Desenvolvimento de Sistemas", "contrato":"", "funcao":"Analista de Desenvolvimento de Sistemas", "contato":"(73) 98172-5068", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Devison Deiró de Jesus", "area":"CGTICS", "cargo":"Coordenador IV - DAI 5", "contrato":"", "funcao":"Analista de Servidores", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Diego Cavalcante Teixeira Daltro", "area":"CGTICS", "cargo":"", "contrato":"", "funcao":"Superintendente", "contato":"", "vinculo":"Cargo Comissionado", "setor":"CGTICS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Diego Gordiano Santos Quintas Duran", "area":"CGTICS", "cargo":"Apoio Administrativo I", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COPLAN", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Edgleidson Ferreira de Jesus", "area":"CGTICS", "cargo":"Analista de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno I", "contato":"(71) 9834-77436", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Elisa Cristina Cunha de Souza", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Product Owner - Junior II", "contato":"(71) 98183-1206", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Eliza Inêz Amorim Brito", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Product Owner - Sênior I", "contato":"(71) 98859-1319", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Emanuelle Lôbo e Sant'ana", "area":"CGTICS", "cargo":"Consultor em Transformação Digital II", "contrato":"", "funcao":"Product Owner", "contato":"(71) 99212-8420", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Emanuely Jonhson Almeida Fonseca", "area":"CGTICS", "cargo":"Tec. Informática", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COINFRA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Emerson dos Santos Santana", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Sênior II", "contato":"(71) 98180-2824", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Émile de Jesus Santos", "area":"CGTICS", "cargo":"Consultor de Tecnologia da Informação", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Emily Renata Reis Nascimento", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Emily Vitória da Hora Santos", "area":"CGTICS", "cargo":"Consultor de Tecnologia da Informação", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Evando Maia Ferreira", "area":"CGTICS", "cargo":"Consultor Tecnologia da Info. Pleno IV", "contrato":"003/25", "funcao":"Analista de Servidores", "contato":"", "vinculo":"FESF-SUS", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Fabiana Pereira Granja", "area":"CGTICS", "cargo":"Consultor em Transformação Digital I", "contrato":"", "funcao":"Product Owner", "contato":"(71) 99151-3710", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Fabricia Manuela Pereira Gonçalves", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Gerente de Projetos - Júnior III", "contato":"(71) 981077395", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Fabricio de Carvalho Souza", "area":"CGTICS", "cargo":"Analista de Desenvolvimento de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior II", "contato":"(71) 98201-7167", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Felipe Barros de Sousa", "area":"CGTICS", "cargo":"Apoio G. Adm. I Serv", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 98108-4728", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Felipe Cunha Alabi", "area":"CGTICS", "cargo":"Product Owner - Sênior I", "contrato":"002/25", "funcao":"Diretor de TIC", "contato":"", "vinculo":"FESF-SUS", "setor":"COTIC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Felipe de Castro Velame", "area":"CGTICS", "cargo":"Apoio administrativo I", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Felipe Sabóia Nazaré", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor - Pleno II", "contato":"(71) 99369-9779", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Fellipe Alain Santos Silva", "area":"CGTICS", "cargo":"Scrum Master - Pleno III", "contrato":"002/25", "funcao":"Diretor Administrativo", "contato":"(71) 99618-0203", "vinculo":"FESF-SUS", "setor":"DA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Fernando Costa Cirne Fernandes", "area":"CGTICS", "cargo":"Coordenador IV - DAI 5", "contrato":"", "funcao":"Assessor de Tecnologia", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DGIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Filipe Rosário de Assis", "area":"CGTICS", "cargo":"Analista de Desenvolvimento de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Sênior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Flavia Leite Lima", "area":"CGTICS", "cargo":"Assessora Técnica", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COPLAN", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Gabriel Moreira Correa de Souza", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor - Pleno I", "contato":"(71) 98213-1654", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Gabriel Oliveira do Rosário Braga", "area":"CGTICS", "cargo":"Programador de Sistemas - BI", "contrato":"002/25", "funcao":"Programador de Comunicação de Sistemas - Júnior II", "contato":"", "vinculo":"FESF-SUS", "setor":"SUREGS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Gabriel Santana dos Anjos", "area":"CGTICS", "cargo":"Tec. De Apoio ao Usuario de Informática", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Gabriela de Carvalho Santos Mello", "area":"CGTICS", "cargo":"Cientista de Dados", "contrato":"002/25", "funcao":"Cientista de dados Júnior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Gabriela dos Santos Coelho", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Geison Batista dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior III", "contato":"(71) 99289-6927", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Geovane Silva dos Santos", "area":"CGTICS", "cargo":"Assistente Administrativo", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior II", "contato":"(73) 99974-0036", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Gilana da Conceição Ferreira", "area":"CGTICS", "cargo":"aGHuse - suporte de sistemas", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Gilclei Soares de Araújo", "area":"CGTICS", "cargo":"Analista de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Sênior I", "contato":"(71) 99204-0580", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Maria das Graças Silva Pitanga", "area":"CGTICS", "cargo":"Operador de Sistemas", "contrato":"003/25", "funcao":"Secretária Executiva", "contato":"", "vinculo":"FESF-SUS", "setor":"ASSESSORIA ESPECIAL", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Grimaldo Silva de Andrade Júnior", "area":"CGTICS", "cargo":"Analista TIC II", "contrato":"", "funcao":"Analista de Sistemas", "contato":"(71) 99157-4392", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Guilherme Santos Oliveira Cerqueira", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"ASCOM", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Gustavo Henrique dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JÚNIOR II", "contato":"(71) 99231-1993", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Hebert Souza dos Santos", "area":"CGTICS", "cargo":"Técnico Apoio Usuário Informática Jr.", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Igor Cerqueira dos Santos", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Ilana Cátia", "area":"CGTICS", "cargo":"Apoio administrativo II", "contrato":"002/25", "funcao":"Técnico Administrativo", "contato":"(71) 99131-4605", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Isadora Silva da Cruz", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior III", "contato":"(71) 99234-8938", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jade Neves da Silva", "area":"CGTICS", "cargo":"Product Owner - Pleno II", "contrato":"002/25", "funcao":"Lider Técnico - aGHuse", "contato":"(71) 98674-6367", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jailton Rodrigues Moreira", "area":"CGTICS", "cargo":"Técnico Administrativo", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"REDA", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jailton Sampaio dos Santos Júnior", "area":"CGTICS", "cargo":"Analista de banco de dados", "contrato":"002/25", "funcao":"Analista - Júnior III", "contato":"(71) 99971-5436", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jakeline do Nascimento Oliveira", "area":"CGTICS", "cargo":"Gerente de Sistemas e Metódos Administrativos", "contrato":"003/25", "funcao":"Product Owner", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jamerson Roberto do Carmo da Silva", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jamison de Souza Queiroz", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno III", "contato":"(71) 99141-4895", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jaqueline Santos de Jesus", "area":"CGTICS", "cargo":"Técnico Informática", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COINFRA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jefferson Lima da Silva", "area":"CGTICS", "cargo":"DAS 2D", "contrato":"", "funcao":"Coordenador de Sistemas", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jener Luis da Cruz Santos", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico de Servidores e Conectividade", "contato":"", "vinculo":"CRETA", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Jenifer da Silva Fontes", "area":"CGTICS", "cargo":"Técnico Administrativo", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"REDA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jéssica Souza Amorim", "area":"CGTICS", "cargo":"Tec. Administrativo", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"REDA", "setor":"COINFRA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"João Felisberto Lima de Abreu Farias", "area":"CGTICS", "cargo":"Apoio Administrativo I", "contrato":"003/25", "funcao":"Assesoria Técnica de Sistemas", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"João Paulo Alves de Sousa", "area":"CGTICS", "cargo":"Apoio administrativo I", "contrato":"003/25", "funcao":"Analista de Infraestrutura", "contato":"", "vinculo":"FESF-SUS", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"João Pedro da Silva Pereira Santos", "area":"CGTICS", "cargo":"Operador de Sistemas de Informática", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"João Victor Araújo de Jesus", "area":"CGTICS", "cargo":"Assessor de Comunicação", "contrato":"", "funcao":"Assessor de Comunicação", "contato":"", "vinculo":"TLD", "setor":"ASCOM", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"João Victor Lima Conceição", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Sênior I", "contato":"(71) 99353-2613", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"João Victor Magalhães de Carvalho", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior I", "contato":"(71) 99819-64125", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Joás Nogueira dos Santos Magalhães", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno III", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Joice de Araujo Nunes", "area":"CGTICS", "cargo":"Product Owner", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 99107-1833", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Jorge Alberto Sanches de Sousa Filho", "area":"CGTICS", "cargo":"Auxiliar Técnico de Informática", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Josafá Moura Caldas", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Pleno III", "contato":"(71) 99104-5232", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Joselton Calmon Braz Correia", "area":"CGTICS", "cargo":"Gerente de Projetos - Pleno I", "contrato":"002/25", "funcao":"Assessor Especial", "contato":"(71) 9910-80790", "vinculo":"FESF-SUS", "setor":"ASSESSORIA ESPECIAL", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Josy Cleide Lopes da Silva", "area":"CGTICS", "cargo":"Consultor de Tecnologia da Informação", "contrato":"003/25", "funcao":"Suporte - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Júlia Pessoa Moura", "area":"CGTICS", "cargo":"Coordenador II - DAS 3", "contrato":"", "funcao":"Coordenadora de Planejamento", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COPLAN", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Juliana Matos de Jesus Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno I", "contato":"(71) 99358-9437", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Kaique Costa Moura Conceição", "area":"CGTICS", "cargo":"Técnico Apoio Usuário Informática Jr.", "contrato":"003/25", "funcao":"Líder Técnico - Costec", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Katia Regina Coelho Pinheiro", "area":"CGTICS", "cargo":"Lider Estratégica", "contrato":"", "funcao":"Lider Técnico - aGHuse", "contato":"(71) 99198-5134", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Kelson Borges", "area":"CGTICS", "cargo":"Arquiteto de Software", "contrato":"002/25", "funcao":"Arquiteto de software - Sênior I", "contato":"(71) 99287-5225", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Keroly Cristhine Gomes Saad", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Coordenadora de Suporte Operacional", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Kevin Theis", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JÚNIOR I", "contato":"(71) 99286-0663", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Klaus Andrade Reinel", "area":"CGTICS", "cargo":"Coordenador II - DAS 3", "contrato":"", "funcao":"Analista de Projetos, Conectividade e Servidores", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Laercio Santos Rangel", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Analista de Conectividade", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Lais Batista Silva", "area":"CGTICS", "cargo":"Programadora de Sistemas - BI", "contrato":"002/25", "funcao":"Programadora de Comunicação de Sistemas - Júnior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Lara Fabian Alves de Oliveira", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Larissa Mendes Sampaio", "area":"CGTICS", "cargo":"Auxiliar Técnico de Informática", "contrato":"003/25", "funcao":"Analista UX/UI", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Layla Neiva Madureira de Almeida", "area":"CGTICS", "cargo":"Apoio a Gestão Administrativa III", "contrato":"002/25", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"GAB", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Lauro Klein Boaventura Filho", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Gerente - aGHuse", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Leandro Prado Nunes", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Gerente de Projetos - Júnior II", "contato":"(71) 98815-4919", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Leilane Santiago Silva", "area":"CGTICS", "cargo":"Técnico Nível Superior", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"REDA", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Leonardo Costa Moreira Pereira", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Letícia de Oliveira Gomes", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno I", "contato":"(71) 99197-2611", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Lian Ezequiel Souza de Castro", "area":"CGTICS", "cargo":"Scrum Master", "contrato":"002/25", "funcao":"Scrum Master - Pleno II", "contato":"(71) 99253-5424", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Lisianne Passos Luz", "area":"CGTICS", "cargo":"Classe 2/Nível B", "contrato":"", "funcao":"Coordenadora de Educação Permanente e Continuada", "contato":"", "vinculo":"Efetivo", "setor":"DGIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Lizandra Santos Vieira", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COINFRA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Lorena Jorge Santos Santana", "area":"CGTICS", "cargo":"Consultor de tecnologia da informação", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Luan Augusto Mutti Neponoceno", "area":"CGTICS", "cargo":"Analista de banco de dados", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - SENIOR I", "contato":"(71) 99940-8603", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Luan Reimão Mello dos Santos", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico de Conectividade", "contato":"", "vinculo":"CRETA", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Lucas Ventura Ferraz Nogueira", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior III", "contato":"(71) 98194-7992", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Lucas Vinicius Silva Cerqueira de Souza", "area":"CGTICS", "cargo":"Arquiteto de Software", "contrato":"002/25", "funcao":"Arquiteto de Software - Pleno III", "contato":"(71) 99684-6481", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Ludmilla Monfort Oliveira Sousa", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Coordenadora de Gestão da Informação", "contato":"", "vinculo":"Efetivo", "setor":"DGIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Luiz Henrique Biset dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor", "contrato":"002/25", "funcao":"Desenvolvedor Java - Sênior I", "contato":"(71) 99262-3528", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Luiz Henrique Carvalho Borges", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Líder Técnico Front", "contato":"(71) 98112-0751", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Luiz Henrique Jacques Barreto", "area":"CGTICS", "cargo":"Assessor Especial", "contrato":"", "funcao":"Assessor Especial", "contato":"", "vinculo":"PROSUS", "setor":"COPLAN", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Luiz Miguel Santos de Jesus", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Luth Gouveia Caymmi", "area":"CGTICS", "cargo":"Operador de Sistemas de Inf. Pleno II", "contrato":"003/25", "funcao":"Coordenador de Interoperabilidade", "contato":"", "vinculo":"FESF-SUS", "setor":"DGIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Maila Valverde Costa", "area":"CGTICS", "cargo":"Product Owner", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 98768-4220", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Marcelo Alves Santana", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Gerente de Projetos - Sênior I", "contato":"(71) 99700-9070", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Marco Aurélio Silva Gonçalves", "area":"CGTICS", "cargo":"Técnico de Apoio de Informática Jr.", "contrato":"003/25", "funcao":"Líder Técnico - Costec", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Marcos Elias dos Santos Maia", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - PLENO I", "contato":"(71) 98263-2565", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Maria de Fátima da Costa Pereira", "area":"CGTICS", "cargo":"Analista Técnica", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"Efetivo", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Maria Francieli Lucas da Silva", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Maria Isabel de Melo Reis", "area":"CGTICS", "cargo":"Programadora de Sistemas - BI", "contrato":"002/25", "funcao":"Programadora de Comunicação de Sistemas - Júnior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Marlo Marques da Silva Filho", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Sênior I", "contato":"(71) 99171-7209", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Matheus Vinicius Santos Silva", "area":"CGTICS", "cargo":"Coordenador II - DAS 3", "contrato":"", "funcao":"Coordenador de Suporte Técnico", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Messias Santos Silva", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Analista de Conectividade", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Michael Santana dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - PLENO III", "contato":"(71) 99201-0758", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Michel dos Santos Cardoso", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Miriam Evangelista de Brito Macedo", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Nathalia Cheron Rocha", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Coordenadora Financeira", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Neidson Santos de Oliveira", "area":"CGTICS", "cargo":"Consultor Tecnologia da Info. Pleno IV", "contrato":"003/25", "funcao":"Analista de Servidores", "contato":"", "vinculo":"FESF-SUS", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Odirlei de Oliveira Marques", "area":"CGTICS", "cargo":"Coordenador II - DAS 3", "contrato":"", "funcao":"Coordenador de Infraestrutura de TI", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Patrícia Silva dos Santos", "area":"CGTICS", "cargo":"Analista de Geo", "contrato":"002/25", "funcao":"Gerente de Projetos - Júnior III", "contato":"(71) 99186-5014", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Pedro Amaral Brandão", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas e Tecnologia", "contrato":"002/25", "funcao":"Desenvolvedor - Júnior III", "contato":"(71) 99988-1199", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Pedro Mamona", "area":"CGTICS", "cargo":"Desenvolvedor", "contrato":"002/25", "funcao":"Desenvolvedor Java - Júnior I", "contato":"(71) 99661-6266", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Pedro Rocha Silva", "area":"CGTICS", "cargo":"ABADEF", "contrato":"", "funcao":"Técnico em informática", "contato":"", "vinculo":"ABADEF", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Poliana de Souza Sales Elyote", "area":"CGTICS", "cargo":"Programadora de Sistemas - BI", "contrato":"002/25", "funcao":"Programadora de Comunicação de Sistemas - Júnior II", "contato":"", "vinculo":"FESF-SUS", "setor":"ASCOM", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Priscila Lemos Britto Sarte Azevêdo", "area":"CGTICS", "cargo":"Operador de Sistema IV", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COPLAN", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Priscila Vinhas Macedo", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JUNIOR II", "contato":"(71) 99172-4636", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Rafael Freitas Araujo", "area":"CGTICS", "cargo":"Gerente de Projetos", "contrato":"002/25", "funcao":"Assessor Especial", "contato":"", "vinculo":"FESF-SUS", "setor":"ASSESSORIA ESPECIAL", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Rafael Giovanni Dantas dos Santos", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior II", "contato":"(71) 99725-5141", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Raíssa Gonçalves Regueira Penelúc", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JUNIOR II", "contato":"(71) 98811-3643", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Raul Passos da Encarnação", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior III", "contato":"(71) 99981-9320", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Renan Campos Oliveira", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Líder Técnico - Costec", "contato":"", "vinculo":"Cargo Comissionado", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Roberto Bernardes", "area":"CGTICS", "cargo":"Arquiteto de Software", "contrato":"002/25", "funcao":"Arquiteto de software - Sênior I", "contato":"(71) 99969-0608", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Rodrigo Alves Vaz", "area":"CGTICS", "cargo":"Consultor em Transformação Digital I", "contrato":"", "funcao":"Product Owner", "contato":"(71) 98236-2854", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Rodrigo Ladislau da Silva", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java - Pleno III", "contato":"(71) 98275-7602", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Rodrigo Nascimento Hellstrom", "area":"CGTICS", "cargo":"Consultor em Transformação Digital I", "contrato":"", "funcao":"Product Owner", "contato":"(71) 99172-3750", "vinculo":"PRODEB", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Ryan Porto de Oliveira Pereira", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Romeu Augusto Lopes", "area":"CGTICS", "cargo":"GESTOR DE UNIDADE DE TRABALHO II", "contrato":"002/25", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Sandro Weslei Santos Goes", "area":"CGTICS", "cargo":"Product Owner", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Sênior I", "contato":"(75) 98332-8630", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Sheyla Castro Nunes de Souza", "area":"CGTICS", "cargo":"Product Owner", "contrato":"002/25", "funcao":"Product Owner - Pleno I", "contato":"(71) 99988-5890", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Silvana Cristina Braga das Chagas", "area":"CGTICS", "cargo":"Analista de Geo", "contrato":"002/25", "funcao":"Analista Product Owner - Sênior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Silvio Neto", "area":"CGTICS", "cargo":"Scrum Master", "contrato":"002/25", "funcao":"Scrum Master - Júnior III", "contato":"(71) 988043472", "vinculo":"FESF-SUS", "setor":"Regulação", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Simon Vieira de Jesus", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS {PPE}", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Simone Mota dos Santos Borges", "area":"CGTICS", "cargo":"Recepcionista III", "contrato":"002/25", "funcao":"Analista UX/UI", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Taiane Aras dos Santos", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Coordenadora de Contratos", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Tarcisio Silva de Araujo", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor Java Sênior III", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Tássila Morais", "area":"CGTICS", "cargo":"Operador de Sistemas", "contrato":"003/25", "funcao":"Assessora Executiva", "contato":"", "vinculo":"FESF-SUS", "setor":"ASSESSORIA ESPECIAL", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Tássio Henrique de Oliveira Gonçalves", "area":"CGTICS", "cargo":"Operador de Sistema de Computador Jr.", "contrato":"003/25", "funcao":"Técnico em Informática", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Thauan Peralva de Souza Viva", "area":"CGTICS", "cargo":"Técnico Apoio Usuário Informática Jr.", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS", "setor":"COSTEC", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Ueslei Silva de Assis", "area":"CGTICS", "cargo":"Analista de banco de dados", "contrato":"002/25", "funcao":"Analista de Banco de Dados - Junior I", "contato":"", "vinculo":"FESF-SUS", "setor":"COINFRA", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Vanessa Figueredo dos Santos Souza", "area":"CGTICS", "cargo":"Coordenador II - DAS 3", "contrato":"", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"Cargo Comissionado", "setor":"DGIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Vanyle Silva Pereira", "area":"CGTICS", "cargo":"Coordenador III - DAI 4", "contrato":"", "funcao":"Coordenadora de Eventos", "contato":"", "vinculo":"Cargo Comissionado", "setor":"ASSESSORIA ESPECIAL", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Verlayne dos Reis Suzart", "area":"CGTICS", "cargo":"Consultor Tecnologia da Informação", "contrato":"003/25", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Vinicius Odilon Porto Souza", "area":"CGTICS", "cargo":"Assessor Técnico", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COPLAN", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Vitor Costa Menezes", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Júnior III", "contato":"(71) 99160-4540", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Vitória Reis Maciel", "area":"CGTICS", "cargo":"Apoio administrativo I", "contrato":"003/25", "funcao":"Assessoria Técnica", "contato":"", "vinculo":"FESF-SUS", "setor":"COINFRA", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Wagner Cafezeiro Moreira da Silva", "area":"CGTICS", "cargo":"Desenvolvedor de Sistemas", "contrato":"002/25", "funcao":"Desenvolvedor PHP - Pleno III", "contato":"", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Yasmin Menezes da Silva Batista", "area":"CGTICS", "cargo":"Auxiliar Técnico em Informática", "contrato":"", "funcao":"Técnico Administrativo", "contato":"", "vinculo":"CRETA", "setor":"COSTEC", "sexo":"FEMININO", "nivel":""},
+ {"nome":"Yuri de Jesus Goes", "area":"CGTICS", "cargo":"Desenvolvedor BI", "contrato":"002/25", "funcao":"BUSSINESS INTELLIGENCE (BI), ORACLE E POWER BI - JUNIOR II", "contato":"(71) 98239-9510", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Yves Luan do Rosário Moura", "area":"CGTICS", "cargo":"Ciência de dados", "contrato":"002/25", "funcao":"Ciência de Dados - Pleno I", "contato":"(71) 99361-8637", "vinculo":"FESF-SUS", "setor":"COSIS", "sexo":"MASCULINO", "nivel":""},
+ {"nome":"Adrielle Martins da Silva Lima Tavares", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CEDEBA", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Ailla Anthuzia Almeida Lima", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MMCJ", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Alessandro Silva Chineles", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Senior II"},
+ {"nome":"Alexandre Gomes Oliveira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEC", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Almir de Souza Carvalho Júnior", "area":"Implantação", "cargo":"Apoio Administrativo", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"N/A"},
+ {"nome":"Amanda Mércia Silva Rebouças", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na MAS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Ana Beatriz Prazeres Pereira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MTB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Andreza Costa Borges", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Pleno III"},
+ {"nome":"Angela Yasmine Nascimento Sampaio", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HRDB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Antônio Carlos Ferreira Farias", "area":"Implantação", "cargo":"Apoio Administrativo", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"N/A"},
+ {"nome":"Barbara Conceição Mascarenhas de Carvalho", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MMCJ", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Bianca Santos de Jesus", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MMCJ", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Brenda Dias da Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGMF", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Bruno dos Santos Cruz", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Camila Bispo dos Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MTB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Camily Araujo Carvalho de Menezes", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Pleno I"},
+ {"nome":"Candida Carvalho Machado", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Carlos Gabriel Moura Santiago", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Cassia Eduarda Paixão Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGCA", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Cinara Santos Mauricio", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Claudia Cheron Rocha", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Cristian da Conceição Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CIMEB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Daniele de Carvalho", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MMCJ", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Danilo da Silva Homem", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGC", "sexo":"", "nivel":"Pleno I"},
+ {"nome":"Danilo Fernando Lima", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Deivide Eduardo da Silva Barbosa", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGESF", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Dilson Freitas Nascimento Júnior", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGST", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Ellen Vitoria Oliveira dos Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGC", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Enderson Pinto Mendes Leite", "area":"Implantação", "cargo":"Apoio Adm", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Equipe DCTI/FESF", "sexo":"", "nivel":"N/A II"},
+ {"nome":"Enrique Baltazar Araujo", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEC", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Érica Nascimento dos Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MTB", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Esmeralda Aparecida Ribeiro Silva", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no MTB", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Felipe Souza Cidreira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na PRS - Jequié", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Fernando Paranhos Mendes", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HRDB", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Flora Ravena Nascimento Sampaio", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CESAT", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Gabriel Carvalho Almeida Alves", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Gabriel Batista Santos", "area":"Implantação", "cargo":"Apoio Adm", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"ASTEC", "sexo":"", "nivel":"N/A I"},
+ {"nome":"Genivaldo Alves Barbosa Filho", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGST", "sexo":"", "nivel":"Junior I"},
+ {"nome":"George Anderson Mendonça Pereira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGCA", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Geovane Menezes", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Suporte ao Sistema AGHUse", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Geovanna Leal Pereira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CESAT", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Gisele Pereira Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Suporte ao Sistema AGHUse", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Graziele Borges Santos e Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Habacuque Bispo dos Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEPI", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Hamilton Souza Barreto Júnior", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HEML", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Higgor Sampaio Alves", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGI", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Iasmin Barradas Ferreira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CIATOX", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Italo Vilela Alves", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HEML", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Ítalo Lopes do Carmo", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGESF", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Jean de Santana Miranda", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CEDAP", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Jessica Santana Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Jessika Silva de Oliveira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CEDEBA", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Joice da Silva Palmeira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGC", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Jonas Soto Silva Nogueira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na PRS - Feira de Santana", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Jonatas dos Santos Souza", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HELR", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Jorge Antonio Cyrne Lopes Filho", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Pleno II"},
+ {"nome":"José Felipe Costa Carvalho", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na PRS - Ribeira do Pombal", "sexo":"", "nivel":"Junior II"},
+ {"nome":"José Carlos Donato Junior", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGG", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Kailane Santana de Araujo", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Kayanne Maria Santana Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Suporte ao Sistema AGHUse", "sexo":"", "nivel":"Pleno II"},
+ {"nome":"Kelly Cristina Facine Pereira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"Não informado", "setor":"Não informado", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Kelly Souza Santana", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na PRS-Serrinha", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Keyla Silva de Menezes", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Luan de Menezes Sanches", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HRDB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Luana Moura Tinoco", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UPAVC", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Luana Jesus de Almeida Sena", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CERPDF", "sexo":"", "nivel":"Pleno III"},
+ {"nome":"Luana Frontado de Souza", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CREASI", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Lucas dos Reis Cerqueira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGCA", "sexo":"", "nivel":"Pleno I"},
+ {"nome":"Luis Felipe Nascimento Custódio", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na PRS - Guanambi", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Luis Matheus Santiago Daltro", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGCA", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Luiza Diogo da Silva Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Luiza dos Santos da Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Maicon de Santana Prata", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Maisa Soares Gomes", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGVC", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Marcia Gomes dos Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Marco Aurelio Gonçalves", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Marcos Aurélio dos Santos Brandão", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HJM", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Maria Beatriz Almeida Pereira", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HAP", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Maria Beatriz dos Reis Souza", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGPV", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Maria Luiza Leite de Moraes", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGMF", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Maria Luiza Nascimento dos Reis", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGCA", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Mateus Brito Costa Carvalho", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGST", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Mateus da Silva Reis", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Matheus Alves dos Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UPAVC", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Matheus Ishimaru Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Mauricio Cirqueira Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEC", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Mauricio dos Santos Silva", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGC", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Mauricio Silva de Oliveira", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEPI", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Milton Henrique Souza Nascimento Leão Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGG", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Nadia Mirian Santos Bispo", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HRDB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Nathalia Liz Cafezeiro Guimaraes", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na MAS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Natalia Jardin Pena", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HCS", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Nathana Souza Barros", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HAP", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Patricia Valadao Silva Araujo", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Paula de Oliveira Souza", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGPV", "sexo":"", "nivel":"Junior VI"},
+ {"nome":"Paulo Pinheiro da Silva Neto", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Paulo Vitor Costa Davi", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UECAJ8", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Pedro Henrique Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Pedro Ivo Alves da Silva Dantas", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CIMEB", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Rafael Sousa Barbosa Santos", "area":"Implantação", "cargo":"Gestor de unidade de Contrato", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Equipe DCTI/FESF", "sexo":"", "nivel":"N/A III"},
+ {"nome":"Rafael da Silva Bonfim", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGESF", "sexo":"", "nivel":"Junior II"},
+ {"nome":"Rafael Sampaio Freitas Santana", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UECAJ8", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Raine Pinheiro Santana", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse na MAS", "sexo":"", "nivel":"Pleno I"},
+ {"nome":"Rosenelia dos Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior V"},
+ {"nome":"Roberta Azevedo Santos Brandao", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Ryan Coutinho do Bonfim", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGRS", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Sara da Silva Rocha", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGVC", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Sergio Henrique Lima dos Santos Junior", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Senior II"},
+ {"nome":"Taina Siqueira de Jesus", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Tainá Veloso Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no IPERBA", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Tainan Purificação Lopes da Silva", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Pleno III"},
+ {"nome":"Tais Freire Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGESF", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Ully Cristine Tinoco Ferraz", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGVC", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Valter de Jesus Santos Júnior", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HJM", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Vanessa Rios dos Santos", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGMF", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Vinicius Primo Viana Braga", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Liderança de implantação", "sexo":"", "nivel":"Pleno III"},
+ {"nome":"Vinicius Souza Moreira Quirino", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGPV", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Vitor Silva de Jesus", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"Não informado", "sexo":"", "nivel":"Junior I"},
+ {"nome":"Vitoria Palmeira de Jesus", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGE", "sexo":"", "nivel":"Junior III"},
+ {"nome":"Welder Ramos Almeida", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no UEPI", "sexo":"", "nivel":"Junior III"},
+ {"nome":"William Nves dos Santos Cavalcanti", "area":"Implantação", "cargo":"Operador de Sistemas de Informática", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no CIATOX", "sexo":"", "nivel":"Junior IV"},
+ {"nome":"Yuri Gomes dos Santos", "area":"Implantação", "cargo":"Consultor de Tecnologia da Informação", "contrato":"", "funcao":"", "contato":"", "vinculo":"FESF-SUS", "setor":"AGHUse no HGPV", "sexo":"", "nivel":"Junior III"},
+];
+
+function topNWithOthers(counts, n){
+  const arr = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  const top = arr.slice(0,n);
+  const restSum = arr.slice(n).reduce((s,[,v])=>s+v,0);
+  const result = top.map(([nome,val])=>({nome,val}));
+  if(restSum) result.push({nome:'Outros', val:restSum});
+  return result;
+}
+function computeServidoresSISD(){
+  const cgticsList = SERVIDORES.filter(s=>s.area==='CGTICS');
+  const implList = SERVIDORES.filter(s=>s.area==='Implantação');
+  const setorCounts = {}; cgticsList.forEach(s=>{ setorCounts[s.setor]=(setorCounts[s.setor]||0)+1; });
+  const vincCounts = {}; SERVIDORES.forEach(s=>{ const v = s.vinculo==='FESF-SUS {PPE}'?'FESF-SUS (PPE)':s.vinculo; vincCounts[v]=(vincCounts[v]||0)+1; });
+  const sexoCounts = {MASCULINO:0,FEMININO:0,'Não informado':0};
+  cgticsList.forEach(s=>{ const sx = s.sexo||'Não informado'; sexoCounts[sx]=(sexoCounts[sx]||0)+1; });
+  const cargoCounts = {}; implList.forEach(s=>{ const c = /^Apoio Adm/.test(s.cargo) ? 'Apoio Administrativo' : s.cargo; cargoCounts[c]=(cargoCounts[c]||0)+1; });
+  const aghuseSites = new Set(implList.map(s=>s.setor).filter(u=>u.startsWith('AGHUse'))).size;
+  return {
+    total: SERVIDORES.length,
+    cgtics: cgticsList.length,
+    implantacao: implList.length,
+    aghuseSites,
+    setoresCgtics: topNWithOthers(setorCounts, 8),
+    vinculos: topNWithOthers(vincCounts, 5),
+    sexoCgtics: sexoCounts,
+    cargosImplantacao: Object.entries(cargoCounts).sort((a,b)=>b[1]-a[1]).map(([nome,val])=>({nome,val}))
+  };
+}
+const SERVIDORES_SISD = computeServidoresSISD();
 
 /* =========================================================
    STATE / FILTERS
 ========================================================= */
-const state = { search:'', status:'', tipo:'', crit:'', profissional:'', sortCol:'nome', sortDir:1, mapSelectedPerson:null, prodSearch:'', prodProject:'' };
+const state = { search:'', status:'', tipo:'', crit:'', profissional:'', sortCol:'nome', sortDir:1, mapSelectedPerson:null, prodSearch:'', prodProject:'',
+  servSearch:'', servArea:'', servSetor:'', servVinculo:'', servSortCol:'nome', servSortDir:1 };
 
 function matchesFilters(p){
   if(state.status && p.status!==state.status) return false;
@@ -572,6 +896,7 @@ const NAV = [
  {id:'projects',label:'Projetos',icon:'map'},
  {id:'pipeline',label:'Pipeline',icon:'pipeline'},
  {id:'team',label:'Equipes',icon:'users'},
+ {id:'servidores',label:'Servidores SISD',icon:'badge'},
  {id:'indicators',label:'Indicadores',icon:'chart'},
  {id:'productivity',label:'Produtividade',icon:'trophy'},
  {id:'observations',label:'Observações',icon:'note'},
@@ -653,7 +978,7 @@ function setView(id){
   currentView=id;
   document.querySelectorAll('.nav-item').forEach(b=>b.classList.toggle('active',b.dataset.view===id));
   document.getElementById('sidebar').classList.remove('open');
-  const renderers = {overview:renderOverview,projects:renderProjects,pipeline:renderPipeline,team:renderTeam,indicators:renderIndicators,productivity:renderProductivity,observations:renderObservations,
+  const renderers = {overview:renderOverview,projects:renderProjects,pipeline:renderPipeline,team:renderTeam,servidores:renderServidores,indicators:renderIndicators,productivity:renderProductivity,observations:renderObservations,
     reports:renderReports,
     settings:()=>renderPlaceholder('Configurações',['Controle de permissões por perfil (gestor, PO, dev, QA)','Conexão direta à planilha/base de origem (atualização automática)','Personalização de campos, papéis e limites de capacidade'])};
   (renderers[id]||renderOverview)();
@@ -859,28 +1184,11 @@ function renderOverview(){
     </div>`).join('')}
   </div>
 
-  <div class="view-head" style="margin:26px 0 18px;">
-    <div><h1 style="font-size:16px;">Quantitativo de servidores alocados na SISD</h1>
-    <p>Base cadastral de servidores (Atualização Cadastral) — equipe CGTICS e equipe de Implantação AGHUse</p></div>
-  </div>
-  <div class="quant-strip" id="servQuantStrip"></div>
-  <div class="ind-grid" style="margin-bottom:20px">
-    <div class="panel" style="margin-bottom:0">
-      <div class="panel-head"><div><h3>Servidores por setor — CGTICS</h3><div class="sub">${SERVIDORES_SISD.cgtics} servidores lotados na sede</div></div></div>
-      <div class="panel-body bars-list" id="servSetorBars"></div>
+  <div class="panel">
+    <div class="panel-head"><div><h3>Quantitativo de servidores alocados na SISD</h3><div class="sub">Base cadastral — equipe CGTICS e equipe de Implantação AGHUse</div></div>
+      <button class="link-btn" onclick="setView('servidores')">Ver quadro completo de servidores ${icon('arrowRight')}</button>
     </div>
-    <div class="panel" style="margin-bottom:0">
-      <div class="panel-head"><h3>Vínculo contratual</h3></div>
-      <div class="panel-body donut-wrap" id="servVinculoDonut"></div>
-    </div>
-    <div class="panel" style="margin-bottom:0">
-      <div class="panel-head"><h3>Distribuição por sexo — CGTICS</h3></div>
-      <div class="panel-body donut-wrap" id="servSexoDonut"></div>
-    </div>
-    <div class="panel" style="margin-bottom:0">
-      <div class="panel-head"><div><h3>Equipe de Implantação AGHUse</h3><div class="sub">${SERVIDORES_SISD.aghuseSites} unidades de saúde atendidas em campo</div></div></div>
-      <div class="panel-body bars-list" id="servImplantBars"></div>
-    </div>
+    <div class="panel-body"><div class="quant-strip" id="ovwServQuantStrip"></div></div>
   </div>
 
   <div class="panel">
@@ -932,7 +1240,7 @@ function renderOverview(){
   renderCriticalGrid();
   renderObsPreview();
   renderCapacityGrid();
-  renderServidoresQuant();
+  renderServidoresQuant('ovwServQuantStrip');
 }
 
 /* =========================================================
@@ -944,7 +1252,7 @@ function donutGradient(counts,colors){
   Object.keys(counts).forEach(k=>{ const pct=total?counts[k]/total*100:0; parts.push(`${colors[k]} ${acc}% ${acc+pct}%`); acc+=pct; });
   return parts.join(',');
 }
-function renderServidoresQuant(){
+function renderServidoresQuant(containerId){
   const s = SERVIDORES_SISD;
   const stats = [
     {label:'Total de servidores na SISD', val:s.total, color:'var(--navy-900)', ic:'users'},
@@ -952,12 +1260,14 @@ function renderServidoresQuant(){
     {label:'Equipe de Implantação AGHUse', val:s.implantacao, color:'var(--blue-600)', ic:'map'},
     {label:'Unidades de saúde atendidas', val:s.aghuseSites, color:'var(--amber)', ic:'chart'}
   ];
-  document.getElementById('servQuantStrip').innerHTML = stats.map(st=>`<div class="quant-tile" style="--qc:${st.color}">
+  document.getElementById(containerId).innerHTML = stats.map(st=>`<div class="quant-tile" style="--qc:${st.color}">
       <div class="qicon" style="color:${st.color}">${icon(st.ic)}</div>
       <div class="qval">${st.val}</div>
       <div class="qlabel">${st.label}</div>
     </div>`).join('');
-
+}
+function renderServidoresCharts(){
+  const s = SERVIDORES_SISD;
   const maxSetor = Math.max(...s.setoresCgtics.map(x=>x.val));
   document.getElementById('servSetorBars').innerHTML = s.setoresCgtics.map(x=>`<div class="bars-row">
       <span class="lbl">${x.nome}</span>
@@ -984,6 +1294,142 @@ function renderServidoresQuant(){
       <div class="bars-track"><div class="bars-fill" style="width:${x.val/maxCargo*100}%;background:var(--blue-600)"></div></div>
       <span>${x.val}</span>
     </div>`).join('');
+}
+
+/* =========================================================
+   MÓDULO — ACOMPANHAMENTO DOS SERVIDORES DA SISD
+   Quadro completo (busca, filtros, ordenação) a partir da base
+   cadastral (planilha "Atualização Cadastral Servidores.xlsx")
+========================================================= */
+function matchesServFilters(s){
+  if(state.servArea && s.area!==state.servArea) return false;
+  if(state.servSetor && s.setor!==state.servSetor) return false;
+  if(state.servVinculo && s.vinculo!==state.servVinculo) return false;
+  if(state.servSearch){
+    const q = state.servSearch.toLowerCase();
+    const hay = [s.nome,s.cargo,s.funcao,s.setor,s.vinculo].join(' ').toLowerCase();
+    if(!hay.includes(q)) return false;
+  }
+  return true;
+}
+const SERV_TABLE_COLS = [
+ {key:'nome',label:'Nome'},
+ {key:'area',label:'Área'},
+ {key:'cargo',label:'Cargo/Função'},
+ {key:'vinculo',label:'Vínculo'},
+ {key:'setor',label:'Setor/Unidade'},
+ {key:'contato',label:'Contato'},
+ {key:'sexo',label:'Sexo'}
+];
+function renderServidoresTable(container){
+  const data = SERVIDORES.filter(matchesServFilters).sort((a,b)=>{
+    let av = a[state.servSortCol]||'', bv = b[state.servSortCol]||'';
+    av = String(av).toLowerCase(); bv = String(bv).toLowerCase();
+    return av>bv? state.servSortDir : av<bv? -state.servSortDir : 0;
+  });
+  container.innerHTML = `<table class="data-table">
+   <thead><tr>${SERV_TABLE_COLS.map(c=>`<th data-col="${c.key}">${c.label} ${state.servSortCol===c.key?(state.servSortDir>0?'▲':'▼'):''}</th>`).join('')}</tr></thead>
+   <tbody>${data.map(s=>`
+     <tr>
+       <td><strong>${s.nome}</strong>${s.cargo?`<div class="cell-muted" style="font-size:11px">${s.funcao||s.nivel||''}</div>`:''}</td>
+       <td><span class="tipo-badge ${s.area==='CGTICS'?'t-projeto':'t-sustentacao'}">${s.area}</span></td>
+       <td>${s.cargo||'—'}</td>
+       <td>${s.vinculo}</td>
+       <td>${s.setor}</td>
+       <td class="cell-muted">${s.contato||'—'}</td>
+       <td class="cell-muted">${s.sexo?(s.sexo==='MASCULINO'?'Masculino':'Feminino'):'—'}</td>
+     </tr>`).join('') || `<tr><td colspan="7" class="cell-muted" style="padding:20px;text-align:center">Nenhum servidor corresponde aos filtros aplicados.</td></tr>`}
+   </tbody></table>`;
+  container.querySelectorAll('th').forEach(th=>th.addEventListener('click',()=>{
+    const col=th.dataset.col;
+    state.servSortDir = (state.servSortCol===col) ? -state.servSortDir : 1;
+    state.servSortCol = col;
+    renderServidoresTable(container);
+  }));
+}
+function exportServidoresCSV(){
+  const data = SERVIDORES.filter(matchesServFilters);
+  const headers = ['Nome','Área','Cargo/Função','Nível','Vínculo','Setor/Unidade','Contato','Sexo'];
+  const rows = data.map(s=>[s.nome,s.area,s.cargo,s.nivel,s.vinculo,s.setor,s.contato,s.sexo]);
+  const csv = [headers, ...rows].map(r=>r.map(v=>`"${String(v||'').replace(/"/g,'""')}"`).join(';')).join('\n');
+  const blob = new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'servidores_sisd.csv';
+  a.click();
+  toast('CSV de servidores exportado.');
+}
+function renderServidores(){
+  const c = document.getElementById('content');
+  const areas = [...new Set(SERVIDORES.map(s=>s.area))].sort();
+  const setores = [...new Set(SERVIDORES.map(s=>s.setor))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+  const vinculos = [...new Set(SERVIDORES.map(s=>s.vinculo))].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+
+  c.innerHTML = `
+  <div class="view-head"><div><h1>Servidores SISD</h1>
+    <p>Acompanhamento do quadro de servidores alocados na SISD — equipe CGTICS e equipe de Implantação AGHUse</p></div>
+  </div>
+  <div class="quant-strip" id="servQuantStrip"></div>
+  <div class="ind-grid" style="margin-bottom:20px">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><h3>Servidores por setor — CGTICS</h3><div class="sub">${SERVIDORES_SISD.cgtics} servidores lotados na sede</div></div></div>
+      <div class="panel-body bars-list" id="servSetorBars"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><h3>Vínculo contratual</h3></div>
+      <div class="panel-body donut-wrap" id="servVinculoDonut"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><h3>Distribuição por sexo — CGTICS</h3></div>
+      <div class="panel-body donut-wrap" id="servSexoDonut"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><h3>Equipe de Implantação AGHUse</h3><div class="sub">${SERVIDORES_SISD.aghuseSites} unidades de saúde atendidas em campo</div></div></div>
+      <div class="panel-body bars-list" id="servImplantBars"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><div><h3>Quadro de servidores</h3><div class="sub" id="servTableSub"></div></div>
+      <button class="btn btn-ghost btn-sm no-screen-pdf" id="servExportCsv">${icon('download')}Exportar CSV</button>
+    </div>
+    <div class="panel-body">
+      <div class="filter-row no-screen-pdf" style="margin-bottom:14px">
+        <div class="search-box" style="max-width:260px"><input id="servSearch" placeholder="Buscar por nome, cargo, setor..."></div>
+        <select class="filter-select" id="servFArea"><option value="">Área · todas</option>${areas.map(a=>`<option value="${a}">${a}</option>`).join('')}</select>
+        <select class="filter-select" id="servFSetor" style="max-width:220px"><option value="">Setor/Unidade · todos</option>${setores.map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+        <select class="filter-select" id="servFVinculo"><option value="">Vínculo · todos</option>${vinculos.map(v=>`<option value="${v}">${v}</option>`).join('')}</select>
+        <button class="btn btn-ghost btn-sm" id="servClearFilters">Limpar filtros</button>
+      </div>
+      <div class="table-wrap" id="servTableWrap"></div>
+    </div>
+  </div>`;
+
+  document.getElementById('servSearch').value = state.servSearch;
+  document.getElementById('servFArea').value = state.servArea;
+  document.getElementById('servFSetor').value = state.servSetor;
+  document.getElementById('servFVinculo').value = state.servVinculo;
+
+  const refresh = ()=>{
+    renderServidoresTable(document.getElementById('servTableWrap'));
+    const n = SERVIDORES.filter(matchesServFilters).length;
+    document.getElementById('servTableSub').textContent = `${n} de ${SERVIDORES.length} servidores — clique nos cabeçalhos para ordenar`;
+  };
+  document.getElementById('servSearch').addEventListener('input',e=>{ state.servSearch=e.target.value; refresh(); });
+  document.getElementById('servFArea').addEventListener('change',e=>{ state.servArea=e.target.value; markActive('servFArea'); refresh(); });
+  document.getElementById('servFSetor').addEventListener('change',e=>{ state.servSetor=e.target.value; markActive('servFSetor'); refresh(); });
+  document.getElementById('servFVinculo').addEventListener('change',e=>{ state.servVinculo=e.target.value; markActive('servFVinculo'); refresh(); });
+  document.getElementById('servClearFilters').addEventListener('click',()=>{
+    state.servSearch=''; state.servArea=''; state.servSetor=''; state.servVinculo='';
+    ['servFArea','servFSetor','servFVinculo'].forEach(id=>{document.getElementById(id).value='';markActive(id);});
+    document.getElementById('servSearch').value='';
+    refresh();
+  });
+  document.getElementById('servExportCsv').addEventListener('click', exportServidoresCSV);
+
+  renderServidoresQuant('servQuantStrip');
+  renderServidoresCharts();
+  refresh();
 }
 
 function renderCriticalGrid(){
