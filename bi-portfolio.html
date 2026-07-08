@@ -509,6 +509,44 @@ function computeProductivity(){
 const PRODUCTIVITY = computeProductivity();
 
 /* =========================================================
+   SERVIDORES SISD — quantitativo cadastral
+   (base: planilha "Atualização Cadastral Servidores.xlsx",
+   abas CGTICS e Implantação, atualizada em 08/07/2026)
+========================================================= */
+const SERVIDORES_SISD = {
+  cgtics: 200,
+  implantacao: 122,
+  aghuseSites: 37,
+  setoresCgtics: [
+    {nome:'COSIS', val:107},
+    {nome:'COSTEC', val:33},
+    {nome:'COINFRA', val:23},
+    {nome:'DGIS', val:7},
+    {nome:'DA', val:7},
+    {nome:'COPLAN', val:7},
+    {nome:'Assessoria Especial', val:6},
+    {nome:'ASCOM', val:3},
+    {nome:'Outros', val:7}
+  ],
+  vinculos: [
+    {nome:'FESF-SUS', val:250},
+    {nome:'Cargo Comissionado', val:20},
+    {nome:'FESF-SUS (PPE)', val:14},
+    {nome:'CRETA', val:13},
+    {nome:'PRODEB', val:12},
+    {nome:'Outros', val:13}
+  ],
+  sexoCgtics: {MASCULINO:126, FEMININO:73, 'Não informado':1},
+  cargosImplantacao: [
+    {nome:'Operador de Sistemas de Informática', val:74},
+    {nome:'Consultor de Tecnologia da Informação', val:43},
+    {nome:'Apoio Administrativo', val:4},
+    {nome:'Gestor de Unidade de Contrato', val:1}
+  ]
+};
+SERVIDORES_SISD.total = SERVIDORES_SISD.cgtics + SERVIDORES_SISD.implantacao;
+
+/* =========================================================
    STATE / FILTERS
 ========================================================= */
 const state = { search:'', status:'', tipo:'', crit:'', profissional:'', sortCol:'nome', sortDir:1, mapSelectedPerson:null, prodSearch:'', prodProject:'' };
@@ -821,6 +859,30 @@ function renderOverview(){
     </div>`).join('')}
   </div>
 
+  <div class="view-head" style="margin:26px 0 18px;">
+    <div><h1 style="font-size:16px;">Quantitativo de servidores alocados na SISD</h1>
+    <p>Base cadastral de servidores (Atualização Cadastral) — equipe CGTICS e equipe de Implantação AGHUse</p></div>
+  </div>
+  <div class="quant-strip" id="servQuantStrip"></div>
+  <div class="ind-grid" style="margin-bottom:20px">
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><h3>Servidores por setor — CGTICS</h3><div class="sub">${SERVIDORES_SISD.cgtics} servidores lotados na sede</div></div></div>
+      <div class="panel-body bars-list" id="servSetorBars"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><h3>Vínculo contratual</h3></div>
+      <div class="panel-body donut-wrap" id="servVinculoDonut"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><h3>Distribuição por sexo — CGTICS</h3></div>
+      <div class="panel-body donut-wrap" id="servSexoDonut"></div>
+    </div>
+    <div class="panel" style="margin-bottom:0">
+      <div class="panel-head"><div><h3>Equipe de Implantação AGHUse</h3><div class="sub">${SERVIDORES_SISD.aghuseSites} unidades de saúde atendidas em campo</div></div></div>
+      <div class="panel-body bars-list" id="servImplantBars"></div>
+    </div>
+  </div>
+
   <div class="panel">
     <div class="panel-head"><div><h3>Projetos</h3><div class="sub">Tabela filtrável — clique nos cabeçalhos para ordenar</div></div>
       <button class="link-btn" onclick="setView('projects')">Ver mapa de equipe ${icon('arrowRight')}</button>
@@ -870,6 +932,58 @@ function renderOverview(){
   renderCriticalGrid();
   renderObsPreview();
   renderCapacityGrid();
+  renderServidoresQuant();
+}
+
+/* =========================================================
+   QUANTITATIVO DE SERVIDORES — visão geral da base cadastral
+   (CGTICS + Implantação AGHUse)
+========================================================= */
+function donutGradient(counts,colors){
+  let acc=0; const total=Object.values(counts).reduce((a,b)=>a+b,0); const parts=[];
+  Object.keys(counts).forEach(k=>{ const pct=total?counts[k]/total*100:0; parts.push(`${colors[k]} ${acc}% ${acc+pct}%`); acc+=pct; });
+  return parts.join(',');
+}
+function renderServidoresQuant(){
+  const s = SERVIDORES_SISD;
+  const stats = [
+    {label:'Total de servidores na SISD', val:s.total, color:'var(--navy-900)', ic:'users'},
+    {label:'Equipe CGTICS (sede)', val:s.cgtics, color:'var(--accent)', ic:'overview'},
+    {label:'Equipe de Implantação AGHUse', val:s.implantacao, color:'var(--blue-600)', ic:'map'},
+    {label:'Unidades de saúde atendidas', val:s.aghuseSites, color:'var(--amber)', ic:'chart'}
+  ];
+  document.getElementById('servQuantStrip').innerHTML = stats.map(st=>`<div class="quant-tile" style="--qc:${st.color}">
+      <div class="qicon" style="color:${st.color}">${icon(st.ic)}</div>
+      <div class="qval">${st.val}</div>
+      <div class="qlabel">${st.label}</div>
+    </div>`).join('');
+
+  const maxSetor = Math.max(...s.setoresCgtics.map(x=>x.val));
+  document.getElementById('servSetorBars').innerHTML = s.setoresCgtics.map(x=>`<div class="bars-row">
+      <span class="lbl">${x.nome}</span>
+      <div class="bars-track"><div class="bars-fill" style="width:${x.val/maxSetor*100}%;background:var(--accent)"></div></div>
+      <span>${x.val}</span>
+    </div>`).join('');
+
+  const vincColors = {'FESF-SUS':'var(--navy-900)','Cargo Comissionado':'var(--accent)','FESF-SUS (PPE)':'var(--blue-600)','CRETA':'var(--amber)','PRODEB':'var(--slate)','Outros':'var(--gray-300)'};
+  const vincCounts = Object.fromEntries(s.vinculos.map(x=>[x.nome,x.val]));
+  document.getElementById('servVinculoDonut').innerHTML = `
+    <div style="position:relative"><div class="donut" style="background:conic-gradient(${donutGradient(vincCounts,vincColors)})"></div>
+      <div class="donut-center"><strong>${s.total}</strong><span>servidores</span></div></div>
+    <div class="donut-legend">${s.vinculos.map(x=>`<span><i style="background:${vincColors[x.nome]}"></i>${x.nome} — ${x.val}</span>`).join('')}</div>`;
+
+  const sexoColors = {MASCULINO:'var(--blue-600)', FEMININO:'var(--accent)', 'Não informado':'var(--gray-300)'};
+  document.getElementById('servSexoDonut').innerHTML = `
+    <div style="position:relative"><div class="donut" style="background:conic-gradient(${donutGradient(s.sexoCgtics,sexoColors)})"></div>
+      <div class="donut-center"><strong>${s.cgtics}</strong><span>servidores</span></div></div>
+    <div class="donut-legend">${Object.keys(s.sexoCgtics).map(k=>`<span><i style="background:${sexoColors[k]}"></i>${k==='MASCULINO'?'Masculino':k==='FEMININO'?'Feminino':k} — ${s.sexoCgtics[k]}</span>`).join('')}</div>`;
+
+  const maxCargo = Math.max(...s.cargosImplantacao.map(x=>x.val));
+  document.getElementById('servImplantBars').innerHTML = s.cargosImplantacao.map(x=>`<div class="bars-row">
+      <span class="lbl">${x.nome}</span>
+      <div class="bars-track"><div class="bars-fill" style="width:${x.val/maxCargo*100}%;background:var(--blue-600)"></div></div>
+      <span>${x.val}</span>
+    </div>`).join('');
 }
 
 function renderCriticalGrid(){
