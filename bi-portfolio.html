@@ -987,7 +987,10 @@ function computeServidoresSISD(){
   const sexoCounts = {MASCULINO:0,FEMININO:0,'Não informado':0};
   cgticsList.forEach(s=>{ const sx = s.sexo||'Não informado'; sexoCounts[sx]=(sexoCounts[sx]||0)+1; });
   const cargoCounts = {}; implList.forEach(s=>{ const c = /^Apoio Adm/.test(s.cargo) ? 'Apoio Administrativo' : s.cargo; cargoCounts[c]=(cargoCounts[c]||0)+1; });
-  const aghuseSites = new Set(implList.map(s=>s.setor).filter(u=>u.startsWith('AGHUse'))).size;
+  // Fonte: planilha "Acompanhamento de Implantação.xlsx", aba ListaUnidades (atualizada em 28/07/2026) —
+  // 47 unidades com SITUAÇÃO DE IMPLANTAÇÃO = "Em andamento", de 102 unidades no programa
+  // (28 previstas, 23 em planejamento, 4 pausadas). Substitui a contagem antiga, derivada do cadastro de servidores.
+  const aghuseSites = 47;
   return {
     total: SERVIDORES.length,
     cgtics: cgticsList.length,
