@@ -797,86 +797,271 @@ function injectBanner(container){
    VISÃO GERAL
 ========================================================= */
 function renderOverview(){
-  const total = PROJECTS.length;
-  const byStatus = name => PROJECTS.filter(p=>p.status===name).length;
-  const poIndef = PROJECTS.filter(p=>p.poIndef).length;
-  const totalPessoas = ALL_NAMES.length;
+  // ── Métricas derivadas ─────────────────────────────────────────
+  const total     = PROJECTS.length;
+  const byStatus  = s => PROJECTS.filter(p=>p.status===s).length;
+  const byCrit    = c => PROJECTS.filter(p=>p.crit===c && p.status==='Em andamento').length;
+  const poIndef   = PROJECTS.filter(p=>p.poIndef).length;
+  const totalPess = ALL_NAMES.length;
+  const emAnd     = byStatus('Em andamento');
+  const pausados  = byStatus('Pausado');
+  const concl     = byStatus('Concluído');
+  const levReq    = byStatus('Levantando Requisitos');
+  const backlog   = byStatus('Backlog');
+  const altaCrit  = PROJECTS.filter(p=>p.crit==='Alta').length;
+  const overloaded= ROSTER.filter(r=>r.overRoles.length>0).length;
+  const healthScore = Math.max(0,Math.min(100, 100-(pausados*8)-(poIndef*5)-Math.max(0,overloaded-2)*3));
+  const healthColor = healthScore>=80?'#1F8A57':healthScore>=60?'#B5790A':'#C0392B';
+  const healthLabel = healthScore>=80?'Saudável':healthScore>=60?'Atenção':'Crítico';
 
-  const kpis = [
-   {label:'Total de projetos',sub:`${new Set(PROJECTS.map(p=>p.nome.replace(/ \((Projeto|Sustentação)\)$/,''))).size} sistemas únicos`,val:total,icon:'overview',color:'navy-900',f:{}},
-   {label:'Em andamento',val:byStatus('Em andamento'),icon:'pipeline',color:'accent',f:{status:'Em andamento'}},
-   {label:'Levantando requisitos',val:byStatus('Levantando Requisitos'),icon:'note',color:'gray',f:{status:'Levantando Requisitos'}},
-   {label:'Em backlog',val:byStatus('Backlog'),icon:'pipeline',color:'gray',f:{status:'Backlog'}},
-   {label:'PO a definir',val:poIndef,icon:'user',color:'amber',f:{}},
-   {label:'Profissionais envolvidos',val:totalPessoas,icon:'users',color:'navy-900',f:null,nav:'team'}
+  // ── Constantes AGHUse (Excel 03/08/2026) ─────────────────────
+  const AG={emAndamento:47,emPlanejamento:23,previstas:28,pausadas:4,total:102,
+            modImplantados:621,modTotal:1008,pctMod:61.6,implantadores:101};
+
+  // ── Helpers visuais ───────────────────────────────────────────
+  function hbar(pct,color,h=8){
+    return `<div style="background:#EEF1F5;border-radius:99px;height:${h}px;overflow:hidden">
+      <div style="background:${color};width:${Math.min(100,pct)}%;height:100%;border-radius:99px"></div></div>`;
+  }
+  function donut(data,tot,sz=140,sw=26){
+    const r=(sz-sw)/2,cx=sz/2,cy=sz/2,C=2*Math.PI*r;
+    let cum=0;
+    const segs=data.filter(d=>d.val>0).map(d=>{
+      const arc=(d.val/tot)*C;
+      const rot=cum*360-90; cum+=d.val/tot;
+      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${sw}"
+        stroke-dasharray="${arc.toFixed(2)} ${C.toFixed(2)}" transform="rotate(${rot.toFixed(1)} ${cx} ${cy})"/>`;
+    }).join('');
+    return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">${segs}</svg>`;
+  }
+
+  const statusData=[
+    {label:'Em andamento',val:emAnd,color:'#0E9C95'},
+    {label:'Levantando Req.',val:levReq,color:'#838FA1'},
+    {label:'Backlog',val:backlog,color:'#CFD7E2'},
+    {label:'Pausado',val:pausados,color:'#C0392B'},
+    {label:'Concluído',val:concl,color:'#1F8A57'},
   ];
-  const colorVar = c=>({accent:'var(--accent)',green:'var(--green)',red:'var(--red)',amber:'var(--amber)',gray:'var(--gray-500)','navy-900':'var(--navy-900)'})[c];
-  const bgVar = c=>({accent:'var(--accent-100)',green:'var(--green-100)',red:'var(--red-100)',amber:'var(--amber-100)',gray:'var(--gray-100)','navy-900':'var(--gray-100)'})[c];
 
-  const c = document.getElementById('content');
-  c.innerHTML = `
+  const c=document.getElementById('content');
+  c.innerHTML=`
   <div class="view-head">
-    <div><h1>VISÃO GERAL PROJETOS SISTEMAS - SISD/CGTICS</h1></div>
-  </div>
-  <div class="kpi-grid">
-    ${kpis.map(k=>`
-    <div class="kpi-card" style="--kc:${colorVar(k.color)}" data-filter='${k.f?JSON.stringify(k.f):""}' data-nav="${k.nav||''}">
-      <div class="kpi-top"><div class="kpi-icon" style="background:${bgVar(k.color)}">${icon(k.icon).replace('<svg','<svg style="stroke:'+colorVar(k.color)+'"')}</div></div>
-      <div class="kpi-val">${k.val}</div>
-      <div class="kpi-label">${k.label}</div>
-      ${k.sub?`<div class="kpi-sub">${k.sub}</div>`:''}
-    </div>`).join('')}
+    <div><h1>Painel Executivo — SISD / CGTICS</h1><div class="sub">Visão gerencial integrada · Atualizado em 03/08/2026</div></div>
   </div>
 
-  <div class="panel">
-    <div class="panel-head"><div><h3>Projetos</h3><div class="sub">Tabela filtrável — clique nos cabeçalhos para ordenar</div></div>
-      <button class="link-btn" onclick="setView('projects')">Ver mapa de equipe ${icon('arrowRight')}</button>
+  <!-- HEALTH BAR -->
+  <div style="display:flex;align-items:center;gap:20px;background:var(--navy-900);color:#fff;border-radius:var(--radius-md);padding:16px 24px;margin-bottom:20px;flex-wrap:wrap">
+    <div>
+      <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Saúde do Portfólio</div>
+      <div style="display:flex;align-items:baseline;gap:8px">
+        <span style="font-size:34px;font-weight:800;color:${healthColor}">${healthScore}</span>
+        <span style="font-size:12px;opacity:.75">/100 · <strong style="color:${healthColor}">${healthLabel}</strong></span>
+      </div>
     </div>
-    <div class="panel-body" id="portfolioPanelBody">
-      <div class="quant-strip" id="quantStrip"></div>
-      <div class="table-wrap" id="portfolioTableWrap"></div>
+    <div style="flex:0 0 1px;height:40px;background:rgba(255,255,255,.12);margin:0 4px"></div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap">
+      ${[
+        {v:emAnd,       t:'Projetos ativos',        c:'#3FD9CD'},
+        {v:altaCrit,    t:'Alta criticidade',        c:'#E88080'},
+        {v:pausados,    t:'Pausados',                c:'#E88080'},
+        {v:poIndef,     t:'Sem PO definido',         c:'#F0C070'},
+        {v:overloaded,  t:'Sobrecarregados',         c:'#F0C070'},
+        {v:AG.pctMod+'%',t:'AGHUse implantado',     c:'#3FD9CD'},
+        {v:AG.emAndamento,t:'Unidades AGHUse ativas',c:'#3FD9CD'},
+      ].map(x=>`<div style="text-align:center">
+        <div style="font-size:22px;font-weight:800;color:${x.c}">${x.v}</div>
+        <div style="font-size:9px;opacity:.6;white-space:nowrap;margin-top:2px">${x.t}</div>
+      </div>`).join('')}
     </div>
   </div>
 
-  <div class="panel">
-    <div class="panel-head"><div><h3>Pontos de atenção</h3><div class="sub">Criticidade alta e projetos pausados</div></div></div>
-    <div class="panel-body crit-grid" id="criticalGrid"></div>
+  <!-- LINHA 1: Portfólio + AGHUse -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Portfólio de Projetos</h3><div class="sub">Distribuição por status e tipo</div></div></div>
+      <div class="panel-body" style="display:flex;gap:20px;align-items:flex-start">
+        <div style="position:relative;flex-shrink:0">
+          ${donut(statusData,total)}
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
+            <div style="font-size:28px;font-weight:800;color:var(--navy-900);line-height:1">${total}</div>
+            <div style="font-size:10px;color:var(--gray-500)">projetos</div>
+          </div>
+        </div>
+        <div style="flex:1;min-width:0">
+          ${statusData.map(d=>`
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+            <div style="width:9px;height:9px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
+            <div style="font-size:12px;color:var(--gray-700);flex:1">${d.label}</div>
+            <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${d.val}</strong>
+            <div style="width:70px">${hbar(total>0?d.val/total*100:0,d.color,5)}</div>
+            <span style="font-size:11px;color:var(--gray-400);width:32px;text-align:right">${total>0?Math.round(d.val/total*100):0}%</span>
+          </div>`).join('')}
+          <div style="border-top:1px solid var(--gray-200);margin-top:12px;padding-top:10px;display:flex;gap:8px">
+            ${[
+              {l:'Projeto',v:PROJECTS.filter(p=>p.tipo==='Projeto').length,c:'#0E9C95'},
+              {l:'Sustentação',v:PROJECTS.filter(p=>p.tipo==='Sustentação').length,c:'#2E6FB0'},
+              {l:'Concluídos',v:concl,c:'#1F8A57'},
+            ].map(x=>`<div style="flex:1;text-align:center;background:var(--gray-50);border-radius:var(--radius-sm);padding:8px 4px">
+              <div style="font-size:17px;font-weight:800;color:${x.c}">${x.v}</div>
+              <div style="font-size:10px;color:var(--gray-500)">${x.l}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Implantação AGHUse</h3><div class="sub">102 unidades · atualizado 03/08/2026</div></div>
+        <button class="link-btn" onclick="location.href='aghuse-implantacao.html'">Ver módulo ${icon('arrowRight')}</button>
+      </div>
+      <div class="panel-body">
+        <div style="display:flex;gap:20px;align-items:center;margin-bottom:18px">
+          <div style="position:relative;flex-shrink:0">
+            <svg width="96" height="96" viewBox="0 0 96 96">
+              <circle cx="48" cy="48" r="36" fill="none" stroke="#EEF1F5" stroke-width="12"/>
+              <circle cx="48" cy="48" r="36" fill="none" stroke="#0E9C95" stroke-width="12"
+                stroke-dasharray="${(AG.pctMod/100*2*Math.PI*36).toFixed(2)} ${(2*Math.PI*36).toFixed(2)}"
+                transform="rotate(-90 48 48)" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+              <div style="font-size:16px;font-weight:800;color:var(--navy-900)">${AG.pctMod}%</div>
+              <div style="font-size:9px;color:var(--gray-500)">módulos</div>
+            </div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            ${[
+              {v:AG.modImplantados,t:'Módulos implantados',c:'#0E9C95'},
+              {v:AG.modTotal,      t:'Total mapeados',      c:'#2E6FB0'},
+              {v:AG.implantadores, t:'Implantadores campo',  c:'#7A5AB0'},
+              {v:AG.emAndamento,   t:'Unidades em andamento',c:'#0E9C95'},
+            ].map(x=>`<div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:8px 10px">
+              <div style="font-size:19px;font-weight:800;color:${x.c}">${x.v}</div>
+              <div style="font-size:10px;color:var(--gray-500);margin-top:1px">${x.t}</div>
+            </div>`).join('')}
+          </div>
+        </div>
+        ${[
+          {label:'Em andamento', val:AG.emAndamento,   color:'#0E9C95'},
+          {label:'Prevista',     val:AG.previstas,      color:'#2E6FB0'},
+          {label:'Planejamento', val:AG.emPlanejamento, color:'#B5790A'},
+          {label:'Pausada',      val:AG.pausadas,       color:'#C0392B'},
+        ].map(d=>`
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          <div style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
+          <div style="font-size:12px;color:var(--gray-700);flex:1">${d.label}</div>
+          <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${d.val}</strong>
+          <div style="width:100px">${hbar(Math.round(d.val/AG.total*100),d.color,6)}</div>
+          <span style="font-size:11px;color:var(--gray-400);width:30px;text-align:right">${Math.round(d.val/AG.total*100)}%</span>
+        </div>`).join('')}
+      </div>
+    </div>
   </div>
 
+  <!-- LINHA 2: Risco + Capacidade -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Risco do Portfólio</h3><div class="sub">Projetos ativos por criticidade</div></div></div>
+      <div class="panel-body">
+        ${[
+          {label:'Alta',  val:byCrit('Alta'),  color:'#C0392B', bg:'var(--red-100)'},
+          {label:'Média', val:byCrit('Média'), color:'#B5790A', bg:'var(--amber-100)'},
+          {label:'Baixa', val:byCrit('Baixa'), color:'#1F8A57', bg:'var(--green-100)'},
+        ].map(d=>`
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
+          <span style="background:${d.bg};color:${d.color};font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;width:48px;text-align:center;flex-shrink:0">${d.label}</span>
+          <div style="flex:1">${hbar(emAnd>0?d.val/emAnd*100:0,d.color,10)}</div>
+          <strong style="font-size:17px;color:var(--navy-900);width:30px;text-align:right">${d.val}</strong>
+        </div>`).join('')}
+        <div style="border-top:1px solid var(--gray-200);margin-top:8px;padding-top:12px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:8px">Atenção imediata</div>
+          ${PROJECTS.filter(p=>p.status==='Pausado'||p.poIndef).slice(0,4).map(p=>`
+          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:${p.status==='Pausado'?'var(--red-100)':'var(--amber-100)'};border-radius:var(--radius-sm);margin-bottom:5px">
+            <div style="flex:1;font-size:12px;font-weight:600;color:var(--navy-900)">${p.nome}</div>
+            <span style="font-size:10px;color:${p.status==='Pausado'?'var(--red)':'var(--amber)'}">${p.status==='Pausado'?'Pausado':'Sem PO'}</span>
+          </div>`).join('')||'<div class="cell-muted">Nenhum ponto crítico.</div>'}
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Capacidade da Equipe</h3><div class="sub">${totalPess} profissionais · limite por papel</div></div>
+        <button class="link-btn" onclick="setView('team')">Ver equipe ${icon('arrowRight')}</button>
+      </div>
+      <div class="panel-body">
+        ${ROLES.map(role=>{
+          const br=ROSTER.filter(r=>r.roles[role]);
+          const ov=br.filter(r=>r.roles[role].size>ROLE_CAP[role]).length;
+          return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+            <div style="font-size:11px;color:var(--gray-600);width:96px;flex-shrink:0">${ROLE_LABEL[role]}</div>
+            <div style="flex:1">${hbar(Math.min(100,br.length/Math.max(1,ROLE_CAP[role]*2.5)*100),ov>0?'#C0392B':'#0E9C95',8)}</div>
+            <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${br.length}</strong>
+            ${ov>0?`<span style="font-size:10px;background:var(--red-100);color:var(--red);padding:1px 6px;border-radius:99px;flex-shrink:0">${ov} exc.</span>`:'<span style="width:52px"></span>'}
+          </div>`;
+        }).join('')}
+        <div style="border-top:1px solid var(--gray-200);margin-top:10px;padding-top:10px;display:flex;gap:8px">
+          ${[
+            {v:overloaded, t:'Sobrecarregados', c:'#C0392B', bg:'var(--red-100)'},
+            {v:ROSTER.filter(r=>r.totalProjects>=3).length, t:'Em 3+ projetos', c:'#0E9C95', bg:'var(--accent-100)'},
+            {v:Math.round(PROJECTS.filter(p=>p.status==='Em andamento').reduce((a,p)=>a+teamSize(p),0)/Math.max(1,emAnd)), t:'Média equipe', c:'#0A1B33', bg:'var(--gray-100)'},
+          ].map(x=>`<div style="flex:1;text-align:center;background:${x.bg};border-radius:var(--radius-sm);padding:8px 4px">
+            <div style="font-size:18px;font-weight:800;color:${x.c}">${x.v}</div>
+            <div style="font-size:10px;color:var(--gray-500)">${x.t}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LINHA 3: POs + Projetos prioritários -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Carga dos Product Owners</h3><div class="sub">Projetos ativos por PO · limite: ${ROLE_CAP.po}</div></div></div>
+      <div class="panel-body">
+        ${(()=>{
+          const pm={};
+          PROJECTS.filter(p=>p.status==='Em andamento').forEach(p=>p.po.forEach(o=>{pm[o]=(pm[o]||0)+1;}));
+          return Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([po,cnt])=>{
+            const ov=cnt>ROLE_CAP.po;
+            return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+              <div style="font-size:11px;color:var(--gray-700);width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${po}">${po}</div>
+              <div style="flex:1">${hbar(Math.min(100,cnt/ROLE_CAP.po*100),ov?'#C0392B':'#2E6FB0',8)}</div>
+              <strong style="font-size:13px;color:${ov?'var(--red)':'var(--navy-900)'};width:20px;text-align:right">${cnt}</strong>
+            </div>`;
+          }).join('');
+        })()}
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><div><h3>Projetos Prioritários</h3><div class="sub">Alta criticidade em andamento</div></div>
+        <button class="link-btn" onclick="setView('projects')">Ver todos ${icon('arrowRight')}</button>
+      </div>
+      <div class="panel-body">
+        ${PROJECTS.filter(p=>p.crit==='Alta'&&p.status==='Em andamento').slice(0,6).map(p=>`
+        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:6px;background:var(--gray-50);border-left:3px solid var(--red)">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:600;color:var(--navy-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nome}</div>
+            <div style="font-size:11px;color:var(--gray-500);margin-top:2px">${p.po.join(', ')||'PO a definir'} · ${teamSize(p)} pessoa(s)</div>
+          </div>
+          ${tipoBadge(p.tipo)}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>
+
+  <!-- LINHA 4: Observações -->
   <div class="panel">
-    <div class="panel-head"><div><h3>Observações registradas</h3><div class="sub">Notas da equipe sobre escopo, dependências e pendências</div></div>
+    <div class="panel-head"><div><h3>Observações e Pendências</h3><div class="sub">Itens registrados que demandam atenção</div></div>
       <button class="link-btn" onclick="setView('observations')">Ver todas ${icon('arrowRight')}</button>
     </div>
-    <div class="panel-body" id="obsPreview"></div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-head"><div><h3>Distribuição de capacidade da equipe</h3><div class="sub">Quantidade de frentes por papel — limite de referência configurável pelo gestor</div></div>
-      <button class="link-btn" onclick="setView('team')">Ver equipe completa ${icon('arrowRight')}</button>
-    </div>
-    <div class="panel-body cap-grid" id="capacityGrid"></div>
+    <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="obsPreview"></div>
   </div>`;
 
   injectBanner(c);
-
-  document.querySelectorAll('.kpi-card').forEach(card=>card.addEventListener('click',()=>{
-    const nav = card.dataset.nav;
-    if(nav){ setView(nav); return; }
-    const f = card.dataset.filter; if(!f) return;
-    const obj = JSON.parse(f);
-    state.status = obj.status||''; state.crit = obj.crit||''; state.tipo=''; state.profissional='';
-    ['fStatus','fTipo','fCrit','fProfissional'].forEach(id=>{document.getElementById(id).value='';markActive(id);});
-    if(obj.status){ document.getElementById('fStatus').value=obj.status; markActive('fStatus'); }
-    if(obj.crit){ document.getElementById('fCrit').value=obj.crit; markActive('fCrit'); }
-    setView('projects');
-    document.querySelector('.tab-btn[data-tab="tabela"]').click();
-  }));
-
-  renderPortfolioTable(document.getElementById('portfolioTableWrap'), PROJECTS);
-  renderQuantStrip('quantStrip', PROJECTS.filter(matchesFilters));
-  renderCriticalGrid();
   renderObsPreview();
-  renderCapacityGrid();
 }
 
 function renderCriticalGrid(){
