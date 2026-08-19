@@ -323,6 +323,311 @@ table.data-table tbody tr:hover{background:var(--gray-50);}
   .content{padding:16px;}
   .topbar{padding:10px 14px;}
 }
+
+/* =========================================================
+   VISÃO GERAL — Painel Executivo (redesign 2026)
+   Tokens e componentes do kit SISD. Escopo: .sisd-vg (a view Visão Geral).
+   ========================================================= */
+:root {
+  /* ---- Cor · marca -------------------------------------------------- */
+  --sisd-navy:        #071B35; /* azul-marinho institucional */
+  --sisd-blue:        #1677FF; /* azul tecnológico  */
+  --sisd-blue-strong: #0B5BD3;
+  --sisd-blue-soft:   #EAF3FF;
+  --sisd-blue-border: #BBD6FF;
+  --sisd-teal:        #00AFA5; /* turquesa saúde digital */
+  --sisd-teal-strong: #0E8F88;
+  --sisd-teal-soft:   #E4F6F4;
+
+  /* ---- Cor · semântica (uso exclusivo para status) -------------------- */
+  --sisd-success:      #22A06B;
+  --sisd-success-soft: #E6F5EE;
+  --sisd-warning:      #E9A23B;
+  --sisd-warning-soft: #FDF3E3;
+  --sisd-critical:     #D94A4A;
+  --sisd-critical-soft:#FBEAEA;
+  --sisd-neutral:      #94A3B8;
+  --sisd-neutral-2:    #CBD5E1;
+
+  /* ---- Cor · superfície e texto -------------------------------------- */
+  --sisd-bg:           #F6F8FB;
+  --sisd-surface:      #FFFFFF;
+  --sisd-surface-alt:  #F6F8FB;
+  --sisd-text:         #172033;
+  --sisd-text-2:       #4A5567;
+  --sisd-text-muted:   #687386;
+  --sisd-border:       #E6EAF0;
+  --sisd-border-soft:  #EEF1F6;
+  --sisd-on-navy:      #8CA2C0;
+
+  /* ---- Tipografia ----------------------------------------------------- */
+  --sisd-font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sisd-fs-display: 26px; /* título de página      · 600 */
+  --sisd-fs-kpi:     30px; /* número de KPI         · 700 */
+  --sisd-fs-kpi-sm:  20px;
+  --sisd-fs-title:   16px; /* título de módulo      · 600 */
+  --sisd-fs-body:    13.5px;
+  --sisd-fs-sm:      12.5px;
+  --sisd-fs-label:   11px;  /* uppercase · 600 · tracking .09em */
+  --sisd-lh-tight: 1.15;
+  --sisd-lh-base:  1.5;
+
+  /* ---- Espaçamento (base 8) ------------------------------------------ */
+  --sisd-s1: 4px;  --sisd-s2: 8px;  --sisd-s3: 12px; --sisd-s4: 16px;
+  --sisd-s5: 20px; --sisd-s6: 24px; --sisd-s7: 32px; --sisd-s8: 40px;
+
+  /* ---- Raio, borda, sombra, movimento -------------------------------- */
+  --sisd-r-sm: 8px; --sisd-r-md: 10px; --sisd-r-lg: 12px; --sisd-r-xl: 16px;
+  --sisd-shadow-hover: 0 8px 24px rgba(23,32,51,.07);
+  --sisd-shadow-drawer: -12px 0 40px rgba(7,27,53,.16);
+  --sisd-ease: 180ms cubic-bezier(.2,.6,.2,1);
+  --sisd-ease-fast: 150ms ease;
+
+  /* ---- Layout ---------------------------------------------------------- */
+  --sisd-sidebar-w: 236px;
+  --sisd-sidebar-w-collapsed: 76px;
+  --sisd-topbar-h: 60px;
+  --sisd-content-max: 1600px;
+  /* Breakpoints (referência): 1920 / 1440 / 1366 / 1200 / 1024 / 768 / 480 */
+}
+
+/* ==========================================================================
+   SISD · Painel Executivo — componentes
+   Depende de tokens.css. Nenhuma dependência externa além da fonte Inter.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+body.sisd {
+  margin: 0;
+  background: var(--sisd-bg);
+  font-family: var(--sisd-font);
+  color: var(--sisd-text);
+  -webkit-font-smoothing: antialiased;
+}
+.sisd a { color: var(--sisd-blue); text-decoration: none; }
+.sisd a:hover { color: var(--sisd-blue-strong); }
+.sisd ::-webkit-scrollbar { width: 10px; height: 10px; }
+.sisd ::-webkit-scrollbar-thumb { background: #D6DCE6; border-radius: 8px; border: 3px solid var(--sisd-bg); }
+.sisd :focus-visible { outline: 2px solid var(--sisd-blue); outline-offset: 2px; border-radius: 6px; }
+
+.sisd [hidden] { display: none !important; }
+.sisd-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* -------------------------------------------------- Sidebar ------------- */
+  width: var(--sisd-sidebar-w); flex: 0 0 auto;
+  background: var(--sisd-navy); color: #fff;
+  display: flex; flex-direction: column;
+  position: sticky; top: 0; left: 0; height: 100vh; z-index: 10;
+  transition: width 200ms ease, transform 220ms ease;
+}
+
+  position: relative; display: flex; align-items: center; gap: var(--sisd-s3);
+  width: 100%; min-height: 40px; padding: 0 var(--sisd-s3);
+  border: 0; border-radius: 9px; cursor: pointer;
+  background: transparent; color: var(--sisd-on-navy);
+  font-family: inherit; font-size: 13.5px; font-weight: 500; text-align: left;
+  transition: background var(--sisd-ease-fast), color var(--sisd-ease-fast);
+}
+
+/* -------------------------------------------------- Topbar -------------- */
+.sisd-spacer { flex: 1; min-width: 8px; }
+
+.sisd-btn { display: inline-flex; align-items: center; justify-content: center; gap: var(--sisd-s2); height: 40px; min-width: 40px; padding: 0 var(--sisd-s4); border-radius: var(--sisd-r-md); border: 1px solid var(--sisd-border); background: #fff; color: var(--sisd-text); font-family: inherit; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: background var(--sisd-ease-fast), border-color var(--sisd-ease-fast); }
+.sisd-btn:hover { background: var(--sisd-blue-soft); border-color: var(--sisd-blue-border); }
+.sisd-btn--sm { height: 38px; }
+.sisd-btn--icon { padding: 0; width: 40px; }
+.sisd-btn--primary { background: var(--sisd-blue); border-color: var(--sisd-blue); color: #fff; font-weight: 600; }
+.sisd-btn--primary:hover { background: var(--sisd-blue-strong); border-color: var(--sisd-blue-strong); }
+.sisd-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* -------------------------------------------------- Layout -------------- */
+.sisd-content { padding: var(--sisd-s7) var(--sisd-s6) var(--sisd-s7); display: flex; flex-direction: column; gap: var(--sisd-s7); max-width: var(--sisd-content-max); width: 100%; margin: 0 auto; }
+.sisd-pagehead { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--sisd-s5); }
+.sisd-pagehead h1 { margin: 0; font-size: var(--sisd-fs-display); font-weight: 600; letter-spacing: -.025em; }
+.sisd-pagehead p { margin: 6px 0 0; font-size: var(--sisd-fs-body); color: var(--sisd-text-muted); }
+.sisd-updated { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--sisd-text-muted); }
+.sisd-updated::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--sisd-success); }
+
+.sisd-sectionhead { display: flex; align-items: baseline; gap: 10px; margin-bottom: var(--sisd-s3); }
+.sisd-sectionhead h2 { margin: 0; font-size: var(--sisd-fs-label); font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--sisd-text-muted); }
+.sisd-sectionhead::after { content: ""; flex: 1; height: 1px; background: var(--sisd-border); }
+
+.sisd-vg { display: flex; flex-direction: column; gap: var(--sisd-s7); }
+.sisd-grid { display: grid; gap: var(--sisd-s5); }
+.sisd-grid--kpi { grid-template-columns: repeat(auto-fit, minmax(178px, 1fr)); gap: var(--sisd-s4); }
+.sisd-kpi--health { grid-column: span 2; }
+/* 5 KPIs + o cartão de saúde (duas colunas) cabem em uma linha só a partir daqui */
+@media (min-width: 1180px) { .sisd-grid--kpi { grid-template-columns: repeat(7, minmax(0, 1fr)); } }
+.sisd-grid--split { grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); }
+@media (min-width: 1180px) { .sisd-grid--split.sisd-grid--wide { grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr); } }
+
+/* -------------------------------------------------- Cards --------------- */
+.sisd-card { background: var(--sisd-surface); border: 1px solid var(--sisd-border); border-radius: var(--sisd-r-xl); padding: var(--sisd-s6); display: flex; flex-direction: column; }
+.sisd-card__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sisd-s3); flex-wrap: wrap; }
+.sisd-card__head h3 { margin: 0; font-size: var(--sisd-fs-title); font-weight: 600; letter-spacing: -.01em; }
+.sisd-card__head p { margin: 4px 0 0; font-size: var(--sisd-fs-sm); color: var(--sisd-text-muted); }
+.sisd-card__action { font-size: var(--sisd-fs-sm); font-weight: 600; }
+.sisd-card__foot { margin-top: auto; padding-top: 18px; border-top: 1px solid var(--sisd-border-soft); }
+
+.sisd-kpi { background: var(--sisd-surface); border: 1px solid var(--sisd-border); border-radius: 14px; padding: var(--sisd-s5); display: flex; flex-direction: column; gap: 14px; transition: transform var(--sisd-ease), box-shadow var(--sisd-ease), border-color var(--sisd-ease); }
+.sisd-kpi:hover { transform: translateY(-2px); box-shadow: var(--sisd-shadow-hover); border-color: #D6E2F2; }
+.sisd-kpi__top { display: flex; align-items: center; justify-content: space-between; }
+.sisd-kpi__icon { width: 34px; height: 34px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
+.sisd-kpi__trend { display: inline-flex; align-items: center; gap: 4px; font-size: 11.5px; font-weight: 600; }
+.sisd-kpi__value { font-size: var(--sisd-fs-kpi); font-weight: 700; line-height: 1; letter-spacing: -.03em; }
+.sisd-kpi__label { font-size: 13px; font-weight: 600; margin-top: var(--sisd-s2); }
+.sisd-kpi__context { font-size: 11.5px; color: var(--sisd-text-muted); margin-top: 4px; line-height: 1.4; }
+
+.sisd-kpi--health { background: var(--sisd-navy); border-color: var(--sisd-navy); color: #fff; flex-direction: row; align-items: center; gap: 18px; padding: var(--sisd-s5) 22px; }
+.sisd-kpi--health:hover { box-shadow: 0 10px 28px rgba(7,27,53,.18); border-color: var(--sisd-navy); }
+.sisd-kpi--health .sisd-label { color: var(--sisd-on-navy); }
+.sisd-kpi--health .sisd-note { font-size: 11.5px; color: #7E93B2; margin-top: var(--sisd-s2); line-height: 1.4; }
+
+.sisd-label { font-size: var(--sisd-fs-label); font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--sisd-text-muted); }
+.sisd-note { font-size: 11.5px; color: var(--sisd-text-muted); }
+
+/* -------------------------------------------------- Gráficos ------------ */
+.sisd-ring { position: relative; border-radius: 50%; flex: 0 0 auto; }
+.sisd-ring__hole { position: absolute; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.sisd-ring--gauge { width: 74px; height: 74px; }
+.sisd-ring--gauge .sisd-ring__hole { inset: 9px; background: var(--sisd-navy); }
+.sisd-ring--donut { width: 150px; height: 150px; }
+.sisd-ring--donut .sisd-ring__hole { inset: 24px; background: #fff; }
+.sisd-ring--progress { width: 118px; height: 118px; }
+.sisd-ring--progress .sisd-ring__hole { inset: 15px; background: #fff; }
+
+.sisd-legend { flex: 1 1 240px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sisd-legend__row { display: grid; grid-template-columns: 16px minmax(0,1fr) 34px 96px 40px; align-items: center; gap: 10px; padding: 7px var(--sisd-s2); border-radius: var(--sisd-r-sm); transition: background var(--sisd-ease-fast); }
+.sisd-legend__row:hover { background: var(--sisd-bg); }
+.sisd-swatch { width: 9px; height: 9px; border-radius: 50%; }
+.sisd-legend__name { font-size: 13px; }
+.sisd-legend__value { font-size: 13.5px; font-weight: 600; text-align: right; }
+.sisd-legend__pct { font-size: 12px; color: var(--sisd-text-muted); text-align: right; }
+
+.sisd-bar { height: 6px; border-radius: 3px; background: var(--sisd-border-soft); overflow: hidden; display: flex; }
+.sisd-bar--lg { height: 10px; border-radius: 5px; }
+.sisd-bar--md { height: 9px; border-radius: 5px; }
+.sisd-bar__fill { height: 100%; border-radius: inherit; transition: width 250ms ease; }
+
+.sisd-tile { background: var(--sisd-surface-alt); border-radius: var(--sisd-r-md); padding: var(--sisd-s3) 14px; }
+.sisd-tile__value { font-size: 19px; font-weight: 700; letter-spacing: -.02em; }
+.sisd-tile__label { font-size: 11px; color: var(--sisd-text-muted); margin-top: 2px; }
+.sisd-tile--center { text-align: center; padding: var(--sisd-s4); border-radius: var(--sisd-r-lg); }
+.sisd-tile--center .sisd-tile__value { font-size: 24px; }
+.sisd-tile--center .sisd-tile__label { font-size: 11.5px; margin-top: 4px; }
+
+.sisd-minikpis { display: flex; gap: 28px; }
+.sisd-minikpis > .sisd-sep { width: 1px; background: var(--sisd-border-soft); }
+.sisd-minikpi__value { font-size: var(--sisd-fs-kpi-sm); font-weight: 700; letter-spacing: -.02em; }
+.sisd-minikpi__label { font-size: 11.5px; color: var(--sisd-text-muted); margin-top: 2px; }
+
+/* -------------------------------------------------- Listas / tabela ----- */
+.sisd-risk__row { display: grid; grid-template-columns: 74px minmax(0,1fr) 30px; align-items: center; gap: var(--sisd-s3); }
+.sisd-tag { display: inline-flex; align-items: center; justify-content: center; height: 22px; padding: 0 var(--sisd-s2); border-radius: 6px; font-size: 11.5px; font-weight: 600; }
+.sisd-risk__count { font-size: 15px; font-weight: 700; text-align: right; }
+
+.sisd-item { display: grid; grid-template-columns: 3px minmax(0,1fr) auto; gap: 14px; align-items: center; padding: var(--sisd-s3) 14px var(--sisd-s3) 0; border: 1px solid var(--sisd-border-soft); border-radius: var(--sisd-r-md); cursor: pointer; overflow: hidden; text-align: left; background: #fff; font-family: inherit; transition: background var(--sisd-ease-fast), border-color var(--sisd-ease-fast); }
+.sisd-item:hover { background: var(--sisd-bg); border-color: #D6E2F2; }
+.sisd-item__accent { align-self: stretch; }
+.sisd-item__name { display: block; font-size: 13.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sisd-item__meta { display: block; font-size: 11.5px; color: var(--sisd-text-muted); margin-top: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sisd-status { font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 6px; white-space: nowrap; }
+.sisd-item__cta { font-size: 12px; font-weight: 600; color: var(--sisd-blue); white-space: nowrap; }
+
+.sisd-role { display: grid; grid-template-columns: 108px minmax(0,1fr) 26px 66px; align-items: center; gap: var(--sisd-s3); }
+.sisd-role__name { font-size: var(--sisd-fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sisd-role__count { font-size: 13.5px; font-weight: 600; text-align: right; }
+.sisd-role__exc { font-size: 11px; font-weight: 600; text-align: right; }
+
+.sisd-po { display: grid; grid-template-columns: 132px minmax(0,1fr) 20px 56px; align-items: center; gap: var(--sisd-s3); }
+.sisd-po__name { font-size: var(--sisd-fs-sm); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sisd-po__track { position: relative; }
+.sisd-po__limit { position: absolute; top: -3px; bottom: -3px; width: 1.5px; background: #C3CCDA; }
+.sisd-po__count { font-size: 13.5px; font-weight: 600; text-align: right; }
+.sisd-po__flag { font-size: 11px; font-weight: 600; color: var(--sisd-critical); text-align: right; }
+
+.sisd-tablewrap { margin-top: 18px; overflow-x: auto; }
+.sisd-table { min-width: 640px; }
+.sisd-tr { display: grid; grid-template-columns: 3px minmax(0,1.4fr) minmax(0,1.3fr) minmax(0,.75fr) minmax(0,.8fr) minmax(0,.8fr) minmax(0,1fr); gap: var(--sisd-s3); align-items: center; padding: 0 var(--sisd-s2) 0 0; }
+.sisd-thead { padding-bottom: 10px; border-bottom: 1px solid var(--sisd-border-soft); }
+.sisd-th { font-size: var(--sisd-fs-label); font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--sisd-text-muted); }
+.sisd-row { min-height: 48px; border-bottom: 1px solid #F2F4F8; cursor: pointer; background: #fff; border-left: 0; border-right: 0; border-top: 0; font-family: inherit; text-align: left; width: 100%; transition: background var(--sisd-ease-fast); }
+.sisd-row:hover { background: var(--sisd-bg); }
+.sisd-row__accent { align-self: stretch; border-radius: 0 2px 2px 0; }
+.sisd-cell { font-size: var(--sisd-fs-sm); color: var(--sisd-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.sisd-cell--strong { font-size: 13.5px; font-weight: 600; color: var(--sisd-text); }
+.sisd-pill { font-size: 11.5px; font-weight: 500; color: var(--sisd-text); background: #F2F4F8; border-radius: 6px; padding: 3px var(--sisd-s2); justify-self: start; }
+.sisd-crit { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 600; }
+
+.sisd-pend { display: grid; grid-template-columns: 3px minmax(0,1fr); gap: 14px; border: 1px solid var(--sisd-border-soft); border-radius: var(--sisd-r-lg); overflow: hidden; transition: border-color var(--sisd-ease-fast), background var(--sisd-ease-fast); }
+.sisd-pend:hover { border-color: #D6E2F2; background: #FBFCFE; }
+.sisd-pend__body { padding: 14px var(--sisd-s4) 14px 0; }
+.sisd-pend__note { margin: var(--sisd-s2) 0 0; font-size: var(--sisd-fs-sm); color: var(--sisd-text-2); line-height: var(--sisd-lh-base); }
+.sisd-pend__meta { display: flex; align-items: center; gap: 14px; margin-top: 10px; font-size: 11.5px; color: var(--sisd-text-muted); }
+.sisd-tab { height: 32px; padding: 0 var(--sisd-s3); border: 1px solid var(--sisd-border); border-radius: var(--sisd-r-sm); background: #fff; color: var(--sisd-text); font-family: inherit; font-size: var(--sisd-fs-sm); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background var(--sisd-ease-fast), border-color var(--sisd-ease-fast); }
+.sisd-tab[aria-pressed="true"] { background: var(--sisd-blue-soft); border-color: var(--sisd-blue-border); color: var(--sisd-blue-strong); }
+.sisd-tab span:last-child { color: var(--sisd-text-muted); font-weight: 500; }
+
+/* -------------------------------------------------- Drawers ------------- */
+.sisd-overlay { position: fixed; inset: 0; background: rgba(7,27,53,.35); z-index: 60; display: flex; justify-content: flex-end; }
+.sisd-overlay[hidden] { display: none; }
+.sisd-drawer { width: 400px; max-width: 94vw; height: 100%; background: #fff; box-shadow: var(--sisd-shadow-drawer); display: flex; flex-direction: column; animation: sisd-slide 200ms ease; }
+.sisd-drawer__head { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--sisd-s3); padding: var(--sisd-s5) var(--sisd-s6); border-bottom: 1px solid var(--sisd-border); }
+.sisd-drawer__title { font-size: var(--sisd-fs-title); font-weight: 600; }
+.sisd-drawer__body { flex: 1; overflow-y: auto; padding: var(--sisd-s5) var(--sisd-s6); display: flex; flex-direction: column; gap: var(--sisd-s6); }
+.sisd-drawer__foot { display: flex; gap: 10px; padding: var(--sisd-s4) var(--sisd-s6); border-top: 1px solid var(--sisd-border); }
+.sisd-drawer__foot .sisd-btn { flex: 1; height: 42px; font-weight: 600; }
+.sisd-optionrow { display: flex; flex-wrap: wrap; gap: var(--sisd-s2); }
+.sisd-option { height: 34px; padding: 0 14px; border: 1px solid var(--sisd-border); border-radius: var(--sisd-r-sm); background: #fff; color: var(--sisd-text); font-family: inherit; font-size: var(--sisd-fs-sm); font-weight: 500; cursor: pointer; transition: background var(--sisd-ease-fast), border-color var(--sisd-ease-fast); }
+.sisd-option[aria-pressed="true"] { background: var(--sisd-blue-soft); border-color: var(--sisd-blue-border); color: var(--sisd-blue-strong); }
+.sisd-kv { display: flex; align-items: center; justify-content: space-between; gap: var(--sisd-s4); padding: var(--sisd-s3) 0; border-bottom: 1px solid #F2F4F8; }
+.sisd-kv dt { font-size: var(--sisd-fs-sm); color: var(--sisd-text-muted); }
+.sisd-kv dd { margin: 0; font-size: 13px; font-weight: 500; text-align: right; }
+
+@keyframes sisd-slide { from { transform: translateX(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sisd-skel { 0% { background-position: -200px 0; } 100% { background-position: calc(200px + 100%) 0; } }
+
+/* -------------------------------------------------- Estados ------------- */
+.sisd-skeleton { background: linear-gradient(90deg, #EEF1F6 0px, #F7F9FC 80px, #EEF1F6 160px); background-size: 200px 100%; animation: sisd-skel 1.2s linear infinite; border-radius: 6px; color: transparent !important; pointer-events: none; }
+.sisd-empty, .sisd-error { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--sisd-s2); padding: var(--sisd-s8) var(--sisd-s5); text-align: center; color: var(--sisd-text-muted); font-size: var(--sisd-fs-sm); }
+.sisd-error { color: var(--sisd-critical); }
+.sisd-is-loading .sisd-hide-loading { visibility: hidden; }
+
+/* -------------------------------------------------- Responsivo ---------- */
+
+@media (max-width: 1024px) {
+  .sisd-content { padding: var(--sisd-s5) var(--sisd-s4) var(--sisd-s6); gap: var(--sisd-s6); }
+  .sisd-grid--split { grid-template-columns: minmax(0,1fr); }
+}
+@media (max-width: 768px) {
+  .sisd-grid--kpi { grid-template-columns: minmax(0,1fr) minmax(0,1fr); }
+  .sisd-kpi--health { grid-column: 1 / -1; }
+  .sisd-card__foot { margin-top: var(--sisd-s5); }
+  .sisd-legend__row { grid-template-columns: 16px minmax(0,1fr) 34px 40px; }
+  .sisd-legend__row .sisd-bar { display: none; }
+  .sisd-role { grid-template-columns: 92px minmax(0,1fr) 26px 56px; }
+  .sisd-po { grid-template-columns: 108px minmax(0,1fr) 20px 46px; }
+}
+@media (max-width: 560px) {
+  .sisd-card { padding: var(--sisd-s4); }
+  .sisd-card__head { flex-direction: column; align-items: flex-start; }
+  .sisd-minikpis { gap: var(--sisd-s5); }
+  .sisd-table { min-width: 560px; }
+}
+@media (max-width: 480px) {
+  .sisd-grid--kpi { grid-template-columns: minmax(0,1fr); }
+  .sisd-minikpis { flex-wrap: wrap; gap: var(--sisd-s5); }
+  .sisd-drawer { width: 100%; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+@media print {
+  .sisd-card { break-inside: avoid; }
+  .sisd-vg { background: transparent; }
+}
+
 </style>
 </head>
 <body>
@@ -796,272 +1101,463 @@ function injectBanner(container){
 /* =========================================================
    VISÃO GERAL
 ========================================================= */
+/* =========================================================
+   VISÃO GERAL — Painel Executivo (redesign 2026)
+   Estrutura e componentes do kit SISD. Todos os números derivam de
+   PROJECTS / ROSTER; nada é fixado à mão além das constantes do AGHUse,
+   que vêm da planilha de implantação e não existem neste arquivo.
+========================================================= */
+const VG_AGHUSE = { emAndamento:47, emPlanejamento:23, previstas:28, pausadas:4, total:102,
+                    modImplantados:621, modTotal:1008, implantadores:101, atualizado:'03/08/2026' };
+const VG_TONE = {
+  critical:{fg:'var(--sisd-critical)', bg:'var(--sisd-critical-soft)'},
+  warning: {fg:'var(--sisd-warning)',  bg:'var(--sisd-warning-soft)'},
+  success: {fg:'var(--sisd-success)',  bg:'var(--sisd-success-soft)'},
+  teal:    {fg:'var(--sisd-teal-strong)', bg:'var(--sisd-teal-soft)'},
+  info:    {fg:'var(--sisd-blue)',     bg:'var(--sisd-blue-soft)'},
+  neutral: {fg:'var(--sisd-text-muted)', bg:'#F2F4F8'}
+};
+const VG_ICON = {
+  projetos:'M3 7h6l2 2h10v10H3z',
+  alerta:'M12 3l9 17H3zM12 9v5M12 17.5v.5',
+  pausa:'M10 5v14M15 5v14',
+  pessoas:'M3 20a6 6 0 0112 0M9 11a4 4 0 100-8 4 4 0 000 8M19 8v4M19 15v.5',
+  hospital:'M4 20V9l8-5 8 5v11M10 12h4M12 10v4'
+};
+const vgEsc = s => String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const vgTone = t => VG_TONE[t] || VG_TONE.neutral;
+const vgPct  = (n,t) => t ? n/t*100 : 0;
+const vgNum  = n => Number(n).toLocaleString('pt-BR');
+const vgDec  = n => n.toFixed(1).replace('.',',');
+function vgIcon(name,size){
+  return `<svg width="${size||17}" height="${size||17}" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+    stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${VG_ICON[name]||''}"/></svg>`;
+}
+function vgBar(w,color,cls){
+  return `<span class="sisd-bar ${cls||''}"><span class="sisd-bar__fill" style="width:${w.toFixed(1)}%;background:${color}"></span></span>`;
+}
+function vgConic(stops){ return `conic-gradient(${stops.join(',')})`; }
+
+/* Agrupa as observações registradas por urgência, para a Central de Atenção. */
+function vgAtencao(){
+  return PROJECTS.filter(p=>p.obs).map(p=>{
+    const grupo = p.status==='Pausado' ? 'Críticos'
+                : (p.poIndef || p.crit==='Alta' || p.status==='Levantando Requisitos') ? 'Requer atenção'
+                : 'Informativos';
+    const tom = grupo==='Críticos' ? 'critical' : grupo==='Requer atenção' ? 'warning' : 'teal';
+    return { nome:p.nome, grupo, tom, status:p.status, nota:p.obs,
+             dono:p.po.join(', ') || 'PO a definir', proj:p };
+  });
+}
+let vgTab = 'Críticos';
+
 function renderOverview(){
-  // ── Métricas derivadas ─────────────────────────────────────────
-  const total     = PROJECTS.length;
-  const byStatus  = s => PROJECTS.filter(p=>p.status===s).length;
-  const byCrit    = c => PROJECTS.filter(p=>p.crit===c && p.status==='Em andamento').length;
-  const poIndef   = PROJECTS.filter(p=>p.poIndef).length;
-  const totalPess = ALL_NAMES.length;
-  const emAnd     = byStatus('Em andamento');
-  const pausados  = byStatus('Pausado');
-  const concl     = byStatus('Concluído');
-  const levReq    = byStatus('Levantando Requisitos');
-  const backlog   = byStatus('Backlog');
-  const altaCrit  = PROJECTS.filter(p=>p.crit==='Alta').length;
-  const overloaded= ROSTER.filter(r=>r.overRoles.length>0).length;
-  const healthScore = Math.max(0,Math.min(100, 100-(pausados*8)-(poIndef*5)-Math.max(0,overloaded-2)*3));
-  const healthColor = healthScore>=80?'#1F8A57':healthScore>=60?'#B5790A':'#C0392B';
-  const healthLabel = healthScore>=80?'Saudável':healthScore>=60?'Atenção':'Crítico';
+  const total      = PROJECTS.length;
+  const porStatus  = s => PROJECTS.filter(p=>p.status===s).length;
+  const emAnd      = porStatus('Em andamento');
+  const levReq     = porStatus('Levantando Requisitos');
+  const backlog    = porStatus('Backlog');
+  const pausados   = porStatus('Pausado');
+  const concl      = porStatus('Concluído');
+  const altaCrit   = PROJECTS.filter(p=>p.crit==='Alta').length;
+  const poIndef    = PROJECTS.filter(p=>p.poIndef).length;
+  const pessoas    = ALL_NAMES.length;
+  const sobrecarga = ROSTER.filter(r=>r.overRoles.length>0).length;
+  const saude      = Math.max(0, Math.min(100, 100-(pausados*8)-(poIndef*5)-Math.max(0,sobrecarga-2)*3));
+  const saudeTom   = saude>=80 ? 'success' : saude>=60 ? 'warning' : 'critical';
+  const saudeLabel = saude>=80 ? 'Saudável' : saude>=60 ? 'Atenção' : 'Crítico';
+  const pctMod     = vgPct(VG_AGHUSE.modImplantados, VG_AGHUSE.modTotal);
 
-  // ── Constantes AGHUse (Excel 03/08/2026) ─────────────────────
-  const AG={emAndamento:47,emPlanejamento:23,previstas:28,pausadas:4,total:102,
-            modImplantados:621,modTotal:1008,pctMod:61.6,implantadores:101};
-
-  // ── Helpers visuais ───────────────────────────────────────────
-  function hbar(pct,color,h=8){
-    return `<div style="background:#EEF1F5;border-radius:99px;height:${h}px;overflow:hidden">
-      <div style="background:${color};width:${Math.min(100,pct)}%;height:100%;border-radius:99px"></div></div>`;
-  }
-  function donut(data,tot,sz=140,sw=26){
-    const r=(sz-sw)/2,cx=sz/2,cy=sz/2,C=2*Math.PI*r;
-    let cum=0;
-    const segs=data.filter(d=>d.val>0).map(d=>{
-      const arc=(d.val/tot)*C;
-      const rot=cum*360-90; cum+=d.val/tot;
-      return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${sw}"
-        stroke-dasharray="${arc.toFixed(2)} ${C.toFixed(2)}" transform="rotate(${rot.toFixed(1)} ${cx} ${cy})"/>`;
-    }).join('');
-    return `<svg width="${sz}" height="${sz}" viewBox="0 0 ${sz} ${sz}">${segs}</svg>`;
-  }
-
-  const statusData=[
-    {label:'Em andamento',val:emAnd,color:'#0E9C95'},
-    {label:'Levantando Req.',val:levReq,color:'#838FA1'},
-    {label:'Backlog',val:backlog,color:'#CFD7E2'},
-    {label:'Pausado',val:pausados,color:'#C0392B'},
-    {label:'Concluído',val:concl,color:'#1F8A57'},
+  /* ---- Resumo executivo ---- */
+  const kpis = [
+    {icone:'projetos', tom:'info',     valor:emAnd,      rotulo:'Projetos ativos',
+     ctx:`de ${total} no portfólio · ${Math.round(vgPct(emAnd,total))}%`, view:'projects'},
+    {icone:'alerta',   tom:'critical', valor:altaCrit,   rotulo:'Alta criticidade',
+     ctx:`${Math.round(vgPct(altaCrit,total))}% do portfólio`, view:'projects'},
+    {icone:'pausa',    tom:'neutral',  valor:pausados,   rotulo:'Projetos pausados',
+     ctx: pausados ? PROJECTS.filter(p=>p.status==='Pausado').map(p=>p.nome).join(', ') : 'Nenhum projeto pausado', view:'projects'},
+    {icone:'pessoas',  tom:'warning',  valor:sobrecarga, rotulo:'Profissionais sobrecarregados',
+     ctx:`${Math.round(vgPct(sobrecarga,pessoas))}% dos ${pessoas} profissionais`, view:'team'},
+    {icone:'hospital', tom:'teal',     valor:VG_AGHUSE.emAndamento, rotulo:'Unidades AGHUse ativas',
+     ctx:`${vgDec(pctMod)}% dos módulos implantados`, href:'aghuse-implantacao.html'}
   ];
 
-  const c=document.getElementById('content');
-  c.innerHTML=`
-  <div class="view-head">
-    <div><h1>Painel Executivo — SISD / CGTICS</h1><div class="sub">Visão gerencial integrada · Atualizado em 03/08/2026</div></div>
-  </div>
+  /* ---- Portfólio ---- */
+  const statusData = [
+    {label:'Em andamento',          val:emAnd,   cor:'var(--sisd-teal)'},
+    {label:'Levantando requisitos', val:levReq,  cor:'var(--sisd-neutral)'},
+    {label:'Backlog',               val:backlog, cor:'var(--sisd-neutral-2)'},
+    {label:'Pausado',               val:pausados,cor:'var(--sisd-critical)'},
+    {label:'Concluído',             val:concl,   cor:'var(--sisd-success)'}
+  ];
+  let acc = 0;
+  const donutStops = statusData.map(d=>{
+    const a = vgPct(acc,total), b = vgPct(acc+d.val,total);
+    acc += d.val;
+    return `${d.cor} ${a}% ${b}%`;
+  });
 
-  <!-- HEALTH BAR -->
-  <div style="display:flex;align-items:center;gap:20px;background:var(--navy-900);color:#fff;border-radius:var(--radius-md);padding:16px 24px;margin-bottom:20px;flex-wrap:wrap">
-    <div>
-      <div style="font-size:10px;opacity:.6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Saúde do Portfólio</div>
-      <div style="display:flex;align-items:baseline;gap:8px">
-        <span style="font-size:34px;font-weight:800;color:${healthColor}">${healthScore}</span>
-        <span style="font-size:12px;opacity:.75">/100 · <strong style="color:${healthColor}">${healthLabel}</strong></span>
+  /* ---- AGHUse ---- */
+  const unidades = [
+    {label:'Em andamento', n:VG_AGHUSE.emAndamento,   cor:'var(--sisd-teal)'},
+    {label:'Prevista',     n:VG_AGHUSE.previstas,     cor:'var(--sisd-blue)'},
+    {label:'Planejamento', n:VG_AGHUSE.emPlanejamento,cor:'var(--sisd-warning)'},
+    {label:'Pausada',      n:VG_AGHUSE.pausadas,      cor:'var(--sisd-critical)'}
+  ];
+
+  /* ---- Risco ---- */
+  const risco = [
+    {label:'Alta',  n:PROJECTS.filter(p=>p.crit==='Alta'  && p.status==='Em andamento').length, tom:'critical'},
+    {label:'Média', n:PROJECTS.filter(p=>p.crit==='Média' && p.status==='Em andamento').length, tom:'warning'},
+    {label:'Baixa', n:PROJECTS.filter(p=>p.crit==='Baixa' && p.status==='Em andamento').length, tom:'success'}
+  ];
+  const maxRisco = Math.max(1, ...risco.map(r=>r.n));
+  const urgentes = PROJECTS.filter(p=>p.status==='Pausado' || p.poIndef).slice(0,4).map(p=>({
+    p, causa: p.status==='Pausado' ? (p.obs || 'Projeto pausado') : 'Sem Product Owner definido',
+    rotulo: p.status==='Pausado' ? 'Pausado' : 'Sem PO',
+    tom: p.status==='Pausado' ? 'critical' : 'warning',
+    acao: p.status==='Pausado' ? 'Reativar' : 'Atribuir PO'
+  }));
+
+  /* ---- Capacidade ---- */
+  const funcoes = ROLES.map(role=>{
+    const lista = ROSTER.filter(r=>r.roles[role]);
+    return { role, label:ROLE_LABEL[role], n:lista.length,
+             acima:lista.filter(r=>r.roles[role].size>ROLE_CAP[role]).length };
+  });
+  const maxFuncao = Math.max(1, ...funcoes.map(f=>f.n));
+  const mediaEquipe = Math.round(PROJECTS.filter(p=>p.status==='Em andamento')
+    .reduce((a,p)=>a+teamSize(p),0) / Math.max(1,emAnd));
+
+  /* ---- Product Owners ---- */
+  const cargaPO = {};
+  PROJECTS.filter(p=>p.status==='Em andamento').forEach(p=>p.po.forEach(o=>{ cargaPO[o]=(cargaPO[o]||0)+1; }));
+  const pos = Object.entries(cargaPO).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxPO = Math.max(ROLE_CAP.po, ...pos.map(p=>p[1]));
+
+  /* ---- Prioritários ---- */
+  const prioritarios = PROJECTS.filter(p=>p.crit==='Alta' && p.status==='Em andamento').slice(0,6);
+
+  const atencao = vgAtencao();
+
+  const c = document.getElementById('content');
+  c.innerHTML = `
+  <div class="sisd sisd-vg">
+
+    <section class="sisd-pagehead view-head" style="border:0;padding:0">
+      <div>
+        <h1>Painel Executivo</h1>
+        <p>Visão integrada do portfólio de projetos da SISD · SESAB / CGTICS</p>
       </div>
-    </div>
-    <div style="flex:0 0 1px;height:40px;background:rgba(255,255,255,.12);margin:0 4px"></div>
-    <div style="display:flex;gap:24px;flex-wrap:wrap">
-      ${[
-        {v:emAnd,       t:'Projetos ativos',        c:'#3FD9CD'},
-        {v:altaCrit,    t:'Alta criticidade',        c:'#E88080'},
-        {v:pausados,    t:'Pausados',                c:'#E88080'},
-        {v:poIndef,     t:'Sem PO definido',         c:'#F0C070'},
-        {v:overloaded,  t:'Sobrecarregados',         c:'#F0C070'},
-        {v:AG.pctMod+'%',t:'AGHUse implantado',     c:'#3FD9CD'},
-        {v:AG.emAndamento,t:'Unidades AGHUse ativas',c:'#3FD9CD'},
-      ].map(x=>`<div style="text-align:center">
-        <div style="font-size:22px;font-weight:800;color:${x.c}">${x.v}</div>
-        <div style="font-size:9px;opacity:.6;white-space:nowrap;margin-top:2px">${x.t}</div>
-      </div>`).join('')}
-    </div>
-  </div>
+      <div class="sisd-spacer"></div>
+      <span class="sisd-updated">Dados de ${VG_AGHUSE.atualizado}</span>
+    </section>
 
-  <!-- LINHA 1: Portfólio + AGHUse -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Portfólio de Projetos</h3><div class="sub">Distribuição por status e tipo</div></div></div>
-      <div class="panel-body" style="display:flex;gap:20px;align-items:flex-start">
-        <div style="position:relative;flex-shrink:0">
-          ${donut(statusData,total)}
-          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none">
-            <div style="font-size:28px;font-weight:800;color:var(--navy-900);line-height:1">${total}</div>
-            <div style="font-size:10px;color:var(--gray-500)">projetos</div>
-          </div>
-        </div>
-        <div style="flex:1;min-width:0">
-          ${statusData.map(d=>`
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
-            <div style="width:9px;height:9px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
-            <div style="font-size:12px;color:var(--gray-700);flex:1">${d.label}</div>
-            <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${d.val}</strong>
-            <div style="width:70px">${hbar(total>0?d.val/total*100:0,d.color,5)}</div>
-            <span style="font-size:11px;color:var(--gray-400);width:32px;text-align:right">${total>0?Math.round(d.val/total*100):0}%</span>
-          </div>`).join('')}
-          <div style="border-top:1px solid var(--gray-200);margin-top:12px;padding-top:10px;display:flex;gap:8px">
-            ${[
-              {l:'Projeto',v:PROJECTS.filter(p=>p.tipo==='Projeto').length,c:'#0E9C95'},
-              {l:'Sustentação',v:PROJECTS.filter(p=>p.tipo==='Sustentação').length,c:'#2E6FB0'},
-              {l:'Concluídos',v:concl,c:'#1F8A57'},
-            ].map(x=>`<div style="flex:1;text-align:center;background:var(--gray-50);border-radius:var(--radius-sm);padding:8px 4px">
-              <div style="font-size:17px;font-weight:800;color:${x.c}">${x.v}</div>
-              <div style="font-size:10px;color:var(--gray-500)">${x.l}</div>
-            </div>`).join('')}
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Implantação AGHUse</h3><div class="sub">102 unidades · atualizado 03/08/2026</div></div>
-        <button class="link-btn" onclick="location.href='aghuse-implantacao.html'">Ver módulo ${icon('arrowRight')}</button>
-      </div>
-      <div class="panel-body">
-        <div style="display:flex;gap:20px;align-items:center;margin-bottom:18px">
-          <div style="position:relative;flex-shrink:0">
-            <svg width="96" height="96" viewBox="0 0 96 96">
-              <circle cx="48" cy="48" r="36" fill="none" stroke="#EEF1F5" stroke-width="12"/>
-              <circle cx="48" cy="48" r="36" fill="none" stroke="#0E9C95" stroke-width="12"
-                stroke-dasharray="${(AG.pctMod/100*2*Math.PI*36).toFixed(2)} ${(2*Math.PI*36).toFixed(2)}"
-                transform="rotate(-90 48 48)" stroke-linecap="round"/>
-            </svg>
-            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
-              <div style="font-size:16px;font-weight:800;color:var(--navy-900)">${AG.pctMod}%</div>
-              <div style="font-size:9px;color:var(--gray-500)">módulos</div>
+    <section>
+      <div class="sisd-sectionhead"><h2>Resumo executivo</h2></div>
+      <div class="sisd-grid sisd-grid--kpi">
+        <article class="sisd-kpi sisd-kpi--health">
+          <div class="sisd-ring sisd-ring--gauge" role="img" aria-label="Saúde do portfólio ${saude} de 100"
+               style="background:${vgConic([`${vgTone(saudeTom).fg} 0 ${saude}%`,`rgba(255,255,255,.14) ${saude}% 100%`])}">
+            <div class="sisd-ring__hole">
+              <span style="font-size:22px;font-weight:700;letter-spacing:-.02em">${saude}</span>
+              <span style="font-size:9.5px;color:#7E93B2;margin-top:2px">/100</span>
             </div>
           </div>
-          <div style="flex:1;display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            ${[
-              {v:AG.modImplantados,t:'Módulos implantados',c:'#0E9C95'},
-              {v:AG.modTotal,      t:'Total mapeados',      c:'#2E6FB0'},
-              {v:AG.implantadores, t:'Implantadores campo',  c:'#7A5AB0'},
-              {v:AG.emAndamento,   t:'Unidades em andamento',c:'#0E9C95'},
-            ].map(x=>`<div style="background:var(--gray-50);border-radius:var(--radius-sm);padding:8px 10px">
-              <div style="font-size:19px;font-weight:800;color:${x.c}">${x.v}</div>
-              <div style="font-size:10px;color:var(--gray-500);margin-top:1px">${x.t}</div>
+          <div>
+            <div class="sisd-label">Saúde do portfólio</div>
+            <div style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:3px 9px;border-radius:6px;background:rgba(217,74,74,.16);border:1px solid rgba(217,74,74,.35)">
+              <span class="sisd-swatch" style="background:${vgTone(saudeTom).fg}"></span>
+              <span style="font-size:12px;font-weight:600;color:#FF9A9A">${saudeLabel}</span>
+            </div>
+            <div class="sisd-note">${pausados} pausado(s) · ${poIndef} sem PO · ${sobrecarga} sobrecarregado(s)</div>
+          </div>
+        </article>
+        ${kpis.map((k,i)=>{
+          const t = vgTone(k.tom);
+          return `<article class="sisd-kpi" data-kpi="${i}" style="cursor:pointer">
+            <div class="sisd-kpi__top">
+              <div class="sisd-kpi__icon" style="background:${t.bg};color:${t.fg}">${vgIcon(k.icone)}</div>
+            </div>
+            <div>
+              <div class="sisd-kpi__value">${vgNum(k.valor)}</div>
+              <div class="sisd-kpi__label">${k.rotulo}</div>
+              <div class="sisd-kpi__context">${vgEsc(k.ctx)}</div>
+            </div>
+          </article>`;
+        }).join('')}
+      </div>
+    </section>
+
+    <section>
+      <div class="sisd-sectionhead"><h2>Portfólio e implantação</h2></div>
+      <div class="sisd-grid sisd-grid--split">
+
+        <article class="sisd-card">
+          <div class="sisd-card__head">
+            <div><h3>Portfólio de Projetos</h3><p>Distribuição por status</p></div>
+            <a class="sisd-card__action" href="#" data-view="projects">Ver projetos</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:32px;margin-top:24px;flex-wrap:wrap">
+            <div class="sisd-ring sisd-ring--donut" role="img" aria-label="${total} projetos distribuídos por status"
+                 style="background:${vgConic(donutStops)}">
+              <div class="sisd-ring__hole">
+                <span style="font-size:32px;font-weight:700;letter-spacing:-.03em;line-height:1">${total}</span>
+                <span style="font-size:11px;color:var(--sisd-text-muted);margin-top:4px;max-width:92px;line-height:1.3">projetos no portfólio</span>
+              </div>
+            </div>
+            <div class="sisd-legend">
+              ${statusData.map(d=>{
+                const w = vgPct(d.val,total);
+                return `<div class="sisd-legend__row">
+                  <span class="sisd-swatch" style="background:${d.cor}"></span>
+                  <span class="sisd-legend__name">${d.label}</span>
+                  <span class="sisd-legend__value">${d.val}</span>
+                  ${vgBar(w,d.cor)}
+                  <span class="sisd-legend__pct">${Math.round(w)}%</span>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+          <div class="sisd-card__foot sisd-minikpis">
+            ${[{l:'Projeto',v:PROJECTS.filter(p=>p.tipo==='Projeto').length,cor:''},
+               {l:'Sustentação',v:PROJECTS.filter(p=>p.tipo==='Sustentação').length,cor:''},
+               {l:'Concluídos',v:concl,cor:'var(--sisd-success)'}]
+              .map((x,i)=>`${i?'<div class="sisd-sep"></div>':''}
+                <div><div class="sisd-minikpi__value"${x.cor?` style="color:${x.cor}"`:''}>${x.v}</div>
+                <div class="sisd-minikpi__label">${x.l}</div></div>`).join('')}
+          </div>
+        </article>
+
+        <article class="sisd-card">
+          <div class="sisd-card__head">
+            <div><h3>Implantação AGHUse</h3><p>${VG_AGHUSE.total} unidades mapeadas · ${VG_AGHUSE.atualizado}</p></div>
+            <a class="sisd-card__action" href="aghuse-implantacao.html">Ver módulo AGHUse</a>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px;margin-top:22px;flex-wrap:wrap">
+            <div class="sisd-ring sisd-ring--progress" role="img" aria-label="Implantação AGHUse ${vgDec(pctMod)} por cento"
+                 style="background:${vgConic([`var(--sisd-teal) 0 ${pctMod}%`,`var(--sisd-border-soft) ${pctMod}% 100%`])}">
+              <div class="sisd-ring__hole">
+                <span style="font-size:22px;font-weight:700;letter-spacing:-.02em;color:var(--sisd-teal-strong)">${vgDec(pctMod)}%</span>
+                <span style="font-size:10.5px;color:var(--sisd-text-muted);margin-top:3px">implantado</span>
+              </div>
+            </div>
+            <div style="flex:1 1 240px;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px">
+              ${[[vgNum(VG_AGHUSE.modImplantados),'Módulos implantados'],
+                 [vgNum(VG_AGHUSE.modTotal),'Total mapeado'],
+                 [vgNum(VG_AGHUSE.implantadores),'Implantadores em campo'],
+                 [vgNum(VG_AGHUSE.emAndamento),'Unidades em andamento']]
+                .map(t=>`<div class="sisd-tile"><div class="sisd-tile__value">${t[0]}</div><div class="sisd-tile__label">${t[1]}</div></div>`).join('')}
+            </div>
+          </div>
+          <div class="sisd-card__foot">
+            <div class="sisd-label" style="margin-bottom:6px">Situação das unidades</div>
+            ${unidades.map(u=>{
+              const w = vgPct(u.n, VG_AGHUSE.total);
+              return `<div class="sisd-legend__row">
+                <span class="sisd-swatch" style="background:${u.cor}"></span>
+                <span class="sisd-legend__name">${u.label}</span>
+                <span class="sisd-legend__value">${u.n}</span>
+                ${vgBar(w,u.cor)}
+                <span class="sisd-legend__pct">${Math.round(w)}%</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="sisd-sectionhead"><h2>Risco e capacidade</h2></div>
+      <div class="sisd-grid sisd-grid--split">
+
+        <article class="sisd-card">
+          <div class="sisd-card__head"><div><h3>Risco do Portfólio</h3><p>Projetos ativos por criticidade</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:12px;margin-top:20px">
+            ${risco.map(r=>{
+              const t = vgTone(r.tom);
+              return `<div class="sisd-risk__row">
+                <span class="sisd-tag" style="background:${t.bg};color:${t.fg}">${r.label}</span>
+                ${vgBar(vgPct(r.n,maxRisco), t.fg, 'sisd-bar--lg')}
+                <span class="sisd-risk__count">${r.n}</span>
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="sisd-card__foot" style="flex:1;display:flex;flex-direction:column">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <span class="sisd-label">Atenção imediata</span>
+              <span class="sisd-note">${urgentes.length} projeto(s)</span>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+              ${urgentes.length ? urgentes.map(u=>{
+                const t = vgTone(u.tom);
+                return `<button type="button" class="sisd-item" data-projeto="${u.p.id}">
+                  <span class="sisd-item__accent" style="background:${t.fg}"></span>
+                  <span style="min-width:0">
+                    <span class="sisd-item__name">${vgEsc(u.p.nome)}</span>
+                    <span class="sisd-item__meta">${vgEsc(u.causa)}</span>
+                  </span>
+                  <span style="display:flex;align-items:center;gap:10px">
+                    <span class="sisd-status" style="background:${t.bg};color:${t.fg}">${u.rotulo}</span>
+                    <span class="sisd-item__cta">${u.acao}</span>
+                  </span>
+                </button>`;
+              }).join('') : '<div class="sisd-empty">Nenhum projeto exige ação imediata.</div>'}
+            </div>
+          </div>
+        </article>
+
+        <article class="sisd-card">
+          <div class="sisd-card__head">
+            <div><h3>Capacidade da Equipe</h3><p>${pessoas} profissionais · alocação por função</p></div>
+            <a class="sisd-card__action" href="#" data-view="team">Ver capacidade da equipe</a>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:11px;margin-top:20px">
+            ${funcoes.map(f=>`<div class="sisd-role">
+              <span class="sisd-role__name">${f.label}</span>
+              <span class="sisd-bar sisd-bar--md" title="${f.label}: ${f.n} profissionais, ${f.acima} acima da capacidade">
+                <span class="sisd-bar__fill" style="width:${vgPct(f.n-f.acima,maxFuncao).toFixed(1)}%;background:var(--sisd-teal)"></span>
+                <span class="sisd-bar__fill" style="width:${vgPct(f.acima,maxFuncao).toFixed(1)}%;background:var(--sisd-warning)"></span>
+              </span>
+              <span class="sisd-role__count">${f.n}</span>
+              <span class="sisd-role__exc" style="color:${f.acima?'var(--sisd-warning)':'var(--sisd-text-muted)'}">${f.acima?f.acima+' acima':'ok'}</span>
             </div>`).join('')}
           </div>
-        </div>
-        ${[
-          {label:'Em andamento', val:AG.emAndamento,   color:'#0E9C95'},
-          {label:'Prevista',     val:AG.previstas,      color:'#2E6FB0'},
-          {label:'Planejamento', val:AG.emPlanejamento, color:'#B5790A'},
-          {label:'Pausada',      val:AG.pausadas,       color:'#C0392B'},
-        ].map(d=>`
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <div style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0"></div>
-          <div style="font-size:12px;color:var(--gray-700);flex:1">${d.label}</div>
-          <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${d.val}</strong>
-          <div style="width:100px">${hbar(Math.round(d.val/AG.total*100),d.color,6)}</div>
-          <span style="font-size:11px;color:var(--gray-400);width:30px;text-align:right">${Math.round(d.val/AG.total*100)}%</span>
-        </div>`).join('')}
-      </div>
-    </div>
-  </div>
-
-  <!-- LINHA 2: Risco + Capacidade -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Risco do Portfólio</h3><div class="sub">Projetos ativos por criticidade</div></div></div>
-      <div class="panel-body">
-        ${[
-          {label:'Alta',  val:byCrit('Alta'),  color:'#C0392B', bg:'var(--red-100)'},
-          {label:'Média', val:byCrit('Média'), color:'#B5790A', bg:'var(--amber-100)'},
-          {label:'Baixa', val:byCrit('Baixa'), color:'#1F8A57', bg:'var(--green-100)'},
-        ].map(d=>`
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <span style="background:${d.bg};color:${d.color};font-size:10px;font-weight:700;padding:3px 10px;border-radius:99px;width:48px;text-align:center;flex-shrink:0">${d.label}</span>
-          <div style="flex:1">${hbar(emAnd>0?d.val/emAnd*100:0,d.color,10)}</div>
-          <strong style="font-size:17px;color:var(--navy-900);width:30px;text-align:right">${d.val}</strong>
-        </div>`).join('')}
-        <div style="border-top:1px solid var(--gray-200);margin-top:8px;padding-top:12px">
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--gray-400);margin-bottom:8px">Atenção imediata</div>
-          ${PROJECTS.filter(p=>p.status==='Pausado'||p.poIndef).slice(0,4).map(p=>`
-          <div style="display:flex;align-items:center;gap:8px;padding:6px 10px;background:${p.status==='Pausado'?'var(--red-100)':'var(--amber-100)'};border-radius:var(--radius-sm);margin-bottom:5px">
-            <div style="flex:1;font-size:12px;font-weight:600;color:var(--navy-900)">${p.nome}</div>
-            <span style="font-size:10px;color:${p.status==='Pausado'?'var(--red)':'var(--amber)'}">${p.status==='Pausado'?'Pausado':'Sem PO'}</span>
-          </div>`).join('')||'<div class="cell-muted">Nenhum ponto crítico.</div>'}
-        </div>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Capacidade da Equipe</h3><div class="sub">${totalPess} profissionais · limite por papel</div></div>
-        <button class="link-btn" onclick="setView('team')">Ver equipe ${icon('arrowRight')}</button>
-      </div>
-      <div class="panel-body">
-        ${ROLES.map(role=>{
-          const br=ROSTER.filter(r=>r.roles[role]);
-          const ov=br.filter(r=>r.roles[role].size>ROLE_CAP[role]).length;
-          return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-            <div style="font-size:11px;color:var(--gray-600);width:96px;flex-shrink:0">${ROLE_LABEL[role]}</div>
-            <div style="flex:1">${hbar(Math.min(100,br.length/Math.max(1,ROLE_CAP[role]*2.5)*100),ov>0?'#C0392B':'#0E9C95',8)}</div>
-            <strong style="font-size:13px;color:var(--navy-900);width:22px;text-align:right">${br.length}</strong>
-            ${ov>0?`<span style="font-size:10px;background:var(--red-100);color:var(--red);padding:1px 6px;border-radius:99px;flex-shrink:0">${ov} exc.</span>`:'<span style="width:52px"></span>'}
-          </div>`;
-        }).join('')}
-        <div style="border-top:1px solid var(--gray-200);margin-top:10px;padding-top:10px;display:flex;gap:8px">
-          ${[
-            {v:overloaded, t:'Sobrecarregados', c:'#C0392B', bg:'var(--red-100)'},
-            {v:ROSTER.filter(r=>r.totalProjects>=3).length, t:'Em 3+ projetos', c:'#0E9C95', bg:'var(--accent-100)'},
-            {v:Math.round(PROJECTS.filter(p=>p.status==='Em andamento').reduce((a,p)=>a+teamSize(p),0)/Math.max(1,emAnd)), t:'Média equipe', c:'#0A1B33', bg:'var(--gray-100)'},
-          ].map(x=>`<div style="flex:1;text-align:center;background:${x.bg};border-radius:var(--radius-sm);padding:8px 4px">
-            <div style="font-size:18px;font-weight:800;color:${x.c}">${x.v}</div>
-            <div style="font-size:10px;color:var(--gray-500)">${x.t}</div>
-          </div>`).join('')}
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- LINHA 3: POs + Projetos prioritários -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Carga dos Product Owners</h3><div class="sub">Projetos ativos por PO · limite: ${ROLE_CAP.po}</div></div></div>
-      <div class="panel-body">
-        ${(()=>{
-          const pm={};
-          PROJECTS.filter(p=>p.status==='Em andamento').forEach(p=>p.po.forEach(o=>{pm[o]=(pm[o]||0)+1;}));
-          return Object.entries(pm).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([po,cnt])=>{
-            const ov=cnt>ROLE_CAP.po;
-            return `<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-              <div style="font-size:11px;color:var(--gray-700);width:120px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${po}">${po}</div>
-              <div style="flex:1">${hbar(Math.min(100,cnt/ROLE_CAP.po*100),ov?'#C0392B':'#2E6FB0',8)}</div>
-              <strong style="font-size:13px;color:${ov?'var(--red)':'var(--navy-900)'};width:20px;text-align:right">${cnt}</strong>
-            </div>`;
-          }).join('');
-        })()}
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-head"><div><h3>Projetos Prioritários</h3><div class="sub">Alta criticidade em andamento</div></div>
-        <button class="link-btn" onclick="setView('projects')">Ver todos ${icon('arrowRight')}</button>
-      </div>
-      <div class="panel-body">
-        ${PROJECTS.filter(p=>p.crit==='Alta'&&p.status==='Em andamento').slice(0,6).map(p=>`
-        <div style="display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--radius-sm);margin-bottom:6px;background:var(--gray-50);border-left:3px solid var(--red)">
-          <div style="flex:1;min-width:0">
-            <div style="font-size:12px;font-weight:600;color:var(--navy-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.nome}</div>
-            <div style="font-size:11px;color:var(--gray-500);margin-top:2px">${p.po.join(', ')||'PO a definir'} · ${teamSize(p)} pessoa(s)</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:14px;font-size:11px;color:var(--sisd-text-muted);flex-wrap:wrap">
+            <span style="width:20px;height:6px;border-radius:3px;background:var(--sisd-teal)"></span> Dentro da capacidade
+            <span style="width:20px;height:6px;border-radius:3px;background:var(--sisd-warning);margin-left:10px"></span> Acima da capacidade
           </div>
-          ${tipoBadge(p.tipo)}
-        </div>`).join('')}
+          <div style="margin-top:auto;padding-top:20px;display:grid;grid-template-columns:repeat(3,1fr);gap:12px">
+            ${[{v:sobrecarga,l:'Sobrecarregados',cor:'var(--sisd-warning)'},
+               {v:ROSTER.filter(r=>r.totalProjects>=3).length,l:'Em 3+ projetos',cor:''},
+               {v:mediaEquipe,l:'Média por equipe',cor:''}]
+              .map(s=>`<div class="sisd-tile sisd-tile--center">
+                <div class="sisd-tile__value"${s.cor?` style="color:${s.cor}"`:''}>${s.v}</div>
+                <div class="sisd-tile__label">${s.l}</div></div>`).join('')}
+          </div>
+        </article>
       </div>
-    </div>
-  </div>
+    </section>
 
-  <!-- LINHA 4: Observações -->
-  <div class="panel">
-    <div class="panel-head"><div><h3>Observações e Pendências</h3><div class="sub">Itens registrados que demandam atenção</div></div>
-      <button class="link-btn" onclick="setView('observations')">Ver todas ${icon('arrowRight')}</button>
-    </div>
-    <div class="panel-body" style="display:grid;grid-template-columns:1fr 1fr;gap:10px" id="obsPreview"></div>
+    <section>
+      <div class="sisd-sectionhead"><h2>Alocação e prioridades</h2></div>
+      <div class="sisd-grid sisd-grid--split sisd-grid--wide">
+
+        <article class="sisd-card">
+          <div class="sisd-card__head"><div><h3>Carga dos Product Owners</h3>
+            <p>Projetos ativos por PO · máximo recomendado: ${ROLE_CAP.po}</p></div></div>
+          <div style="display:flex;flex-direction:column;gap:9px;margin-top:20px">
+            ${pos.map(([nome,n])=>{
+              const acima = n > ROLE_CAP.po;
+              const cor = acima ? 'var(--sisd-critical)' : 'var(--sisd-blue)';
+              return `<div class="sisd-po">
+                <span class="sisd-po__name" title="${vgEsc(nome)}">${vgEsc(nome)}</span>
+                <span class="sisd-bar sisd-bar--md sisd-po__track">
+                  <span class="sisd-bar__fill" style="width:${vgPct(n,maxPO).toFixed(1)}%;background:${cor}"></span>
+                  <span class="sisd-po__limit" style="left:${vgPct(ROLE_CAP.po,maxPO).toFixed(1)}%"></span>
+                </span>
+                <span class="sisd-po__count" style="color:${cor}">${n}</span>
+                <span class="sisd-po__flag">${acima?'acima':''}</span>
+              </div>`;
+            }).join('')}
+          </div>
+          <div class="sisd-card__foot" style="display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--sisd-text-muted)">
+            <span style="width:1.5px;height:12px;background:#C3CCDA"></span>
+            <span>Linha de limite recomendado (${ROLE_CAP.po} projetos)</span>
+          </div>
+        </article>
+
+        <article class="sisd-card">
+          <div class="sisd-card__head">
+            <div><h3>Projetos Prioritários</h3><p>Alta criticidade em andamento</p></div>
+            <a class="sisd-card__action" href="#" data-view="projects">Ver todos</a>
+          </div>
+          <div class="sisd-tablewrap">
+            <div class="sisd-table" role="table" aria-label="Projetos prioritários">
+              <div class="sisd-tr sisd-thead" role="row">
+                <span></span><span class="sisd-th">Projeto</span><span class="sisd-th">Responsável</span>
+                <span class="sisd-th">Equipe</span><span class="sisd-th">Tipo</span>
+                <span class="sisd-th">Criticidade</span><span class="sisd-th">Status</span>
+              </div>
+              ${prioritarios.map(p=>`<button type="button" class="sisd-tr sisd-row" data-projeto="${p.id}">
+                <span class="sisd-row__accent" style="background:var(--sisd-critical)"></span>
+                <span class="sisd-cell sisd-cell--strong" title="${vgEsc(p.nome)}">${vgEsc(p.nome)}</span>
+                <span class="sisd-cell" title="${vgEsc(p.po.join(', ')||'PO a definir')}">${vgEsc(p.po.join(', ')||'PO a definir')}</span>
+                <span class="sisd-cell">${teamSize(p)} pessoa(s)</span>
+                <span class="sisd-pill">${p.tipo}</span>
+                <span class="sisd-crit" style="color:var(--sisd-critical)">
+                  <span class="sisd-swatch" style="background:var(--sisd-critical)"></span>${p.crit}</span>
+                <span class="sisd-cell" style="color:var(--sisd-teal-strong);font-weight:500">${p.status}</span>
+              </button>`).join('')}
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section>
+      <div class="sisd-sectionhead"><h2>Operação</h2></div>
+      <article class="sisd-card">
+        <div class="sisd-card__head">
+          <div><h3>Central de Atenção</h3><p>Observações e pendências agrupadas por prioridade</p></div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${['Críticos','Requer atenção','Informativos'].map(g=>{
+              const n = atencao.filter(a=>a.grupo===g).length;
+              const dot = g==='Críticos' ? 'var(--sisd-critical)' : g==='Requer atenção' ? 'var(--sisd-warning)' : 'var(--sisd-teal)';
+              return `<button type="button" class="sisd-tab" data-tab="${g}" aria-pressed="${vgTab===g}">
+                <span class="sisd-swatch" style="background:${dot}"></span><span>${g}</span><span>${n}</span></button>`;
+            }).join('')}
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;margin-top:20px">
+          ${(()=>{
+            const itens = atencao.filter(a=>a.grupo===vgTab);
+            if(!itens.length) return '<div class="sisd-empty">Nenhuma pendência neste grupo.</div>';
+            return itens.map(a=>{
+              const t = vgTone(a.tom);
+              return `<article class="sisd-pend">
+                <span style="background:${t.fg}"></span>
+                <div class="sisd-pend__body">
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+                    <span style="font-size:13.5px;font-weight:600">${vgEsc(a.nome)}</span>
+                    <span class="sisd-status" style="background:${t.bg};color:${t.fg}">${a.status}</span>
+                  </div>
+                  <p class="sisd-pend__note">${vgEsc(a.nota)}</p>
+                  <div class="sisd-pend__meta"><span>${vgEsc(a.dono)}</span></div>
+                </div>
+              </article>`;
+            }).join('');
+          })()}
+        </div>
+        <div class="sisd-card__foot" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <span class="sisd-note">Exibindo ${atencao.filter(a=>a.grupo===vgTab).length} de ${atencao.length} pendências registradas</span>
+          <a class="sisd-card__action" href="#" data-view="observations">Ver todas as pendências</a>
+        </div>
+      </article>
+    </section>
   </div>`;
 
+  /* ---- interações: reaproveitam a navegação e os filtros já existentes ---- */
+  c.querySelectorAll('[data-view]').forEach(el=>el.addEventListener('click',ev=>{
+    ev.preventDefault(); setView(el.dataset.view);
+  }));
+  c.querySelectorAll('[data-kpi]').forEach(el=>el.addEventListener('click',()=>{
+    const k = kpis[Number(el.dataset.kpi)];
+    if(k.href) location.href = k.href; else if(k.view) setView(k.view);
+  }));
+  c.querySelectorAll('[data-projeto]').forEach(el=>el.addEventListener('click',()=>{
+    const p = PROJECTS.find(x=>x.id===Number(el.dataset.projeto));
+    if(!p) return;
+    state.search = p.nome;
+    const busca = document.getElementById('globalSearch');
+    if(busca) busca.value = p.nome;
+    setView('projects');
+  }));
+  c.querySelectorAll('.sisd-tab').forEach(el=>el.addEventListener('click',()=>{
+    vgTab = el.dataset.tab; renderOverview(); injectViewExportButton();
+  }));
+
   injectBanner(c);
-  renderObsPreview();
 }
 
 function renderCriticalGrid(){
